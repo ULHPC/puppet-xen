@@ -97,7 +97,7 @@ class xen::params {
     $utils_packages = $::operatingsystem ? {
         default => [
                     'xen-tools',
-                    'xen-utils'
+                    'xen-utils-4.0'
                     ]        
     }
 
