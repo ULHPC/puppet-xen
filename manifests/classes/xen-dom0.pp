@@ -233,7 +233,33 @@ class xen::dom0::common {
 # = Class: xen::dom0::debian
 #
 # Specialization class for Debian systems
-class xen::dom0::debian inherits xen::dom0::common { }
+class xen::dom0::debian inherits xen::dom0::common {
+
+    # Disable bridge filtering
+    # net.bridge.bridge-nf-call-arptables = 0
+    # net.bridge.bridge-nf-call-ip6tables = 0
+    # net.bridge.bridge-nf-call-iptables = 0
+    # net.bridge.bridge-nf-filter-vlan-tagged = 0
+
+    include sysctl
+    sysctl::value { "net.bridge.bridge-nf-call-arptables":
+       value => '0',
+       ensure => "${xen::dom0::ensure}"
+    }
+    sysctl::value { "net.bridge.bridge-nf-call-ip6tables":
+       value => '0',
+       ensure => "${xen::dom0::ensure}"
+    }
+    sysctl::value { "net.bridge.bridge-nf-call-iptables":
+       value => '0',
+       ensure => "${xen::dom0::ensure}"
+    }
+    sysctl::value { "net.bridge.bridge-nf-filter-vlan-tagged":
+       value => '0',
+       ensure => "${xen::dom0::ensure}"
+    }
+
+}
 
 # ------------------------------------------------------------------------------
 # = Class: xen::dom0::redhat
