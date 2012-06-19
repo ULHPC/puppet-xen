@@ -41,26 +41,74 @@ class xen::params {
         default => $xen_bridge_on
     }
 
-    # LVM volume group to use for hosting domU disk image  
+    # Use the pygrub wrapper such that each VM manage its own kernel and don't
+    # use the one of the Xen dom0
+    $domU_use_pygrub = $xen_domU_use_pygrub ? {
+        ''      => true,
+        'yes'   => true,
+        'no'    => false,
+        default => $xen_domU_use_pygrub
+    }
+
+    # Use SCSI names for virtual devices (i.e. sda not xvda). for creating
+    # squeeze hosts, you will probably have to drop this option (as discussed
+    # [here](http://superuser.com/questions/255083/xen-fails-to-boot-timeout-mounting-dev-sda2)
+    # or you won't be able to boot
+    $domU_use_scsi = $xen_domU_use_scsi ? {
+        ''      => false,
+        'yes'   => true,
+        'no'    => false,
+        default => $xen_domU_use_scsi
+    }
+
+    # true if you wish the images to use DHCP
+    $domU_use_dhcp = $xen_domU_use_dhcp ? {
+        ''      => true,
+        'yes'   => true,
+        'no'    => false,
+        default => $xen_domU_use_dhcp
+    }
+
+    # Order of the domU when placed in the /etc/xen/auto directory
+    $domU_order = $xen_domU_order ? {
+        ''      => 50,
+        default => $xen_domU_order
+    }
+
+    # Number of virtual CPUs (i.e. cores) assigned to the domU
+    $domU_vcpus = $xen_domU_vcpus ? {
+        ''      => 1,
+        default => $xen_domU_vcpus
+    }
+
+    # Default distribution to install. (Guess automatically by calling
+    # `xt-guess-suite-and-mirror --suite`by default)
+    $domU_distrib = $xen_domU_distrib ? {
+        ''      => '',
+        default => $xen_domU_distrib
+    }
+
+
+    # LVM volume group to use for hosting domU disk image
     $domU_lvm = $xen_domU_lvm ? {
         ''      => "vg_${hostname}_domU",
-        default => "$xen_domU_lvm"        
+        default => "$xen_domU_lvm"
     }
 
     # domU Disk image size.
     $domU_size = $xen_domU_size ? {
         ''      => '10Gb',
-        default => "$xen_domU_size"        
+        default => "$xen_domU_size"
     }
     # domU Memory size
     $domU_memory = $xen_domU_memory ? {
         ''      => '256Mb',
-        default => "$xen_domU_memory"        
+        default => "$xen_domU_memory"
     }
     # domU Swap size
     $domU_swap = $xen_domU_swap ? {
         ''      => '512Mb',
-        default => "$xen_domU_swap"        
+        default => "$xen_domU_swap"
     }
     # domU network settings
     $domU_gateway = $xen_domU_gateway ? {
@@ -80,25 +128,31 @@ class xen::params {
         ''      => 'amd64',
         default => "$xen_domU_arch"
     }
-    
-    
-    
+
+    # List of the specified role script(s) post-install.
+    $domU_roles = $xen_domU_roles ? {
+        ''      => [ 'udev', 'puppet' ],
+        default => $xen_domU_roles
+    }
+
+
+
     #### MODULE INTERNAL VARIABLES  #########
     # (Modify to adapt to unsupported OSes)
     #######################################
     $packagename = $::operatingsystem ? {
         default => 'xen-hypervisor-4.0-amd64'
     }
-    
+
     $kernel_package = $::operatingsystem ? {
-        default => 'linux-image-2.6-xen-amd64'        
+        default => 'linux-image-2.6-xen-amd64'
     }
-    
+
     $utils_packages = $::operatingsystem ? {
         default => [
                     'xen-tools',
                     'xen-utils-4.0'
-                    ]        
+                    ]
     }
 
     $servicename = $::operatingsystem ? {
@@ -120,19 +174,7 @@ class xen::params {
         default => true,
     }
 
-    $configfile_mode = $::operatingsystem ? {
-        default => '0644',
-    }
-
-    $configfile_owner = $::operatingsystem ? {
-        default => 'root',
-    }
-
-    $configfile_group = $::operatingsystem ? {
-        default => 'root',
-    }
-
-    # Configuration directory for Xen 
+    # Configuration directory for Xen
     $configdir = $::operatingsystem ? {
         default => "/etc/xen",
     }
@@ -147,30 +189,62 @@ class xen::params {
     $configdir_group = $::operatingsystem ? {
         default => 'root',
     }
+
+    # Xend configuration file
+    $configfile = $::operatingsystem ? {
+        default => "${configdir}/xend-config.sxp"
+    }
+    $configfile_mode = $::operatingsystem ? {
+        default => '0644',
+    }
+
+    $configfile_owner = $::operatingsystem ? {
+        default => 'root',
+    }
+
+    $configfile_group = $::operatingsystem ? {
+        default => 'root',
+    }
+
+
     # Xen script dir (in particular for network bridge configuration)
     $scriptsdir = $::operatingsystem ? {
         default => "/etc/xen/scripts",
     }
-    
+
+    # Xen directory holding the domUs to start on boot
+    $autodir = $::operatingsystem ? {
+        default => "${configdir}/auto",
+    }
+
+
     # Directory containing xen-tools
     $toolsdir = $::operatingsystem ? {
         default => "/etc/xen-tools",
     }
-
+    $tools_logdir  = $::operatingsystem ? {
+        default => "/var/log/xen-tools",
+    }
     $grubconfdir = $::operatingsystem ? {
         default => '/etc/grub.d'
     }
-    
+
     $updategrub = $::operatingsystem ? {
         default => 'update-grub'
-        
     }
-    
+    $skeldir = $::operatingsystem ? {
+        default => "${toolsdir}/skel",
+    }
+    $roledir = $::operatingsystem ? {
+        default => "${toolsdir}/role.d",
+    }
 
-    
-    
+
+
+
+
     # $pkgmanager = $::operatingsystem ? {
-    #     /(?i-mx:ubuntu|debian)/	       => [ '/usr/bin/apt-get' ],
+    #     /(?i-mx:ubuntu|debian)/           => [ '/usr/bin/apt-get' ],
     #     /(?i-mx:centos|fedora|redhat)/ => [ '/bin/rpm', '/usr/bin/up2date', '/usr/bin/yum' ],
     #     default => []
     # }
