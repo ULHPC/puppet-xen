@@ -1,4 +1,4 @@
-# File::      <tt>xen.pp</tt>
+# File::      <tt>xen-domO.pp</tt>
 # Author::    Sebastien Varrette (Sebastien.Varrette@uni.lu)
 # Copyright:: Copyright (c) 2011 Sebastien Varrette
 # License::   GPLv3
@@ -11,6 +11,17 @@
 # == Parameters:
 #
 # $ensure:: *Default*: 'present'. Ensure the presence (or absence) of xen
+# $bridge_on:: *Default*: eth1'.  List of the interfaces on which a network
+#     bridge should be configured
+# $domU_lvm:: *Default*: 'vg_${hostname}_domU'. LVM volume group to use for
+#     hosting domU disk image
+# $domU_size:: *Default*: '10Gb'.
+# $domU_memory:: *Default*: '256Mb'.
+# $domU_swap:: *Default*: '512Mb'
+# $domU_gateway:: *Default*: '10.74.0.1'
+# $domU_netmask:: *Default*: '255.255.0.0'
+# $domU_broadcast:: *Default*: '10.74.255.255'
+# $domU_arch:: *Default*: 'amd64'
 #
 # == Requires:
 #
@@ -148,6 +159,14 @@ class xen::dom0::common {
         require => File["${xen::params::configdir}"]
     }
 
+    file { "${xen::params::autodir}":
+        ensure => 'directory',
+        owner   => "${xen::params::configdir_owner}",
+        group   => "${xen::params::configdir_group}",
+        mode    => "${xen::params::configdir_mode}",
+        require => File["${xen::params::configdir}"]
+    }
+    
     # Configure the network bridge file
     file { "${xen::params::scriptsdir}/${hostname}-network-bridge":
         ensure  => 'file',
@@ -171,7 +190,16 @@ class xen::dom0::common {
     #     # (network-script network-bridge)
     # by
     #     (network-script ${hostname}-network-bridge)
-    #
+    file { "${xen::params::configfile}":
+        ensure => 'file',
+        owner   => "${xen::params::configfile_owner}",
+        group   => "${xen::params::configfile_group}",
+        mode    => "${xen::params::configfile_mode}",
+        content => template("xen/xend-config.sxp.erb"),
+        require => File["${xen::params::configdir}"],
+        notify  => Service['xen']        
+    }
+    
 
     # Under squeeze: You have to patch the network script!
     if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'squeeze' ) {
@@ -193,9 +221,6 @@ class xen::dom0::common {
         }
     }
 
-    # Now prepare the /etc/xen-tools/skel
-    # TODO
-
     # Configure xen-tools
     file { "${xen::params::toolsdir}":
         ensure => 'directory',
@@ -203,7 +228,7 @@ class xen::dom0::common {
         group   => "${xen::params::configdir_group}",
         mode    => "${xen::params::configdir_mode}",
     }
-    
+
     file { "${xen::params::toolsdir}/xen-tools.conf":
         ensure  => 'file',
         content => template("xen/xen-tools.conf.erb"),
@@ -213,19 +238,72 @@ class xen::dom0::common {
         require => File["${xen::params::toolsdir}"]
     }
 
+    # Prepare the role directory
+    file { "${xen::params::roledir}":
+        ensure => 'directory',
+        owner   => "${xen::params::configdir_owner}",
+        group   => "${xen::params::configdir_group}",
+        mode    => "${xen::params::configdir_mode}",
+        require => File["${xen::params::toolsdir}"]
+    }
 
+    file { "${xen::params::roledir}/motd":
+        ensure  => 'file',
+        owner   => "${xen::params::configdir_owner}",
+        group   => "${xen::params::configdir_group}",
+        mode    => "0755",
+        content => template('xen/role.d/motd.erb'),
+        require => File["${xen::params::roledir}"]
+    }
+   
+    # Prepare the skeleton directory
+    file { "${xen::params::skeldir}":
+        ensure => 'directory',
+        owner   => "${xen::params::configdir_owner}",
+        group   => "${xen::params::configdir_group}",
+        mode    => "${xen::params::configdir_mode}",
+        require => File["${xen::params::toolsdir}"]
+    }
 
+    
+    # Prepare eventually the SSH keys for the root user
+    if !defined( Ssh::Keygen['root']) {
 
-    # service { 'xen':
-    #     name       => "${xen::params::servicename}",
-    #     enable     => true,
-    #     ensure     => running,
-    #     hasrestart => "${xen::params::hasrestart}",
-    #     pattern    => "${xen::params::processname}",
-    #     hasstatus  => "${xen::params::hasstatus}",
-    #     require    => Package['xen'],
-    #     subscribe  => File['xen.conf'],
-    # }
+        ssh::keygen{ 'root':
+            path    => "/root/.ssh",
+            type    => 'dsa',
+            comment => "Root user on ${fqdn}"
+        }
+    }
+
+    # Populate the skeleton directory
+    file { [
+            "${xen::params::skeldir}/etc",
+            "${xen::params::skeldir}/root",
+            ]:
+                ensure => 'directory',
+                owner   => 'root',
+                group   => 'root', 
+                mode    => "${xen::params::configdir_mode}",
+                require => File["${xen::params::skeldir}"]
+    }
+
+    # The final service 
+    service { 'xen':
+        name       => "${xen::params::servicename}",
+        enable     => true,
+        ensure     => running,
+        hasrestart => "${xen::params::hasrestart}",
+        pattern    => "${xen::params::processname}",
+        hasstatus  => "${xen::params::hasstatus}",
+        require    => [
+                       Package['xen'],
+                       File["${xen::params::configdir}"],
+                       Augeas["/etc/default/xendomains/XENDOMAINS_RESTORE"],
+                       File["${xen::params::scriptsdir}/${hostname}-network-bridge"]
+                       ],
+        subscribe  => File["${xen::params::configfile}"],
+    }
 }
 
 
@@ -243,20 +321,20 @@ class xen::dom0::debian inherits xen::dom0::common {
 
     include sysctl
     sysctl::value { "net.bridge.bridge-nf-call-arptables":
-       value => '0',
-       ensure => "${xen::dom0::ensure}"
+        value => '0',
+        ensure => "${xen::dom0::ensure}"
     }
     sysctl::value { "net.bridge.bridge-nf-call-ip6tables":
-       value => '0',
-       ensure => "${xen::dom0::ensure}"
+        value => '0',
+        ensure => "${xen::dom0::ensure}"
     }
     sysctl::value { "net.bridge.bridge-nf-call-iptables":
-       value => '0',
-       ensure => "${xen::dom0::ensure}"
+        value => '0',
+        ensure => "${xen::dom0::ensure}"
     }
     sysctl::value { "net.bridge.bridge-nf-filter-vlan-tagged":
-       value => '0',
-       ensure => "${xen::dom0::ensure}"
+        value => '0',
+        ensure => "${xen::dom0::ensure}"
     }
 
 }
