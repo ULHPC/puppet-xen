@@ -65,7 +65,7 @@ define xen::domU (
     $arch       = $xen::params::domU_arch,
     $roles      = $xen::params::domU_roles,
     $desc       = '',
-    $do_force   = false, 
+    $do_force   = false,
     $ip         = '',
     $bridge     = '',
     $mac        = '',
@@ -78,9 +78,10 @@ define xen::domU (
 
     # $name is provided at define invocation
     $domU_hostname = "${name}"
-    
-    $domU_configfile = "${xen::params::configdir}/${domU_hostname}.cfg"
-    
+
+    $domU_configfile          = "${xen::params::configdir}/${domU_hostname}.cfg"
+    $domU_snapshot_configfile = "${xen::params::configdir}/${domU_hostname}-snapshot.cfg"
+
     $domU_infofile = $infofile ? {
         ''      => "${xen::params::configdir}/info_${domU_hostname}.txt",
         default => "${infofile}"
@@ -94,7 +95,7 @@ define xen::domU (
         ''      => "${lsbdistcodename}",
         default => "${distrib}"
     }
-    
+
     if ("${domU_hostname}" == '') {
         fail("Cannot create Xen domain with empty name")
     }
@@ -108,7 +109,7 @@ define xen::domU (
 
     $authorized_ensure = [ 'present', 'absent', 'running', 'stopped' ]
 
-    
+
     if ! ($ensure in $authorized_ensure) {
         fail("xen::domU 'ensure' parameter must be set to either 'present', 'absent', 'running', 'stopped'")
     }
@@ -146,9 +147,9 @@ define xen::domU (
         },
         default => "IP: ${ip}"
     }
-    
+
     $motd_role_args = "--role-args=\"--motd_hostname '${domU_hostname}' --motd_msg1 '${desc}' --motd_netinfo '${motd_netinfo}' --motd_vcpus ${vcpus} --motd_ramsize '${ramsize}' --motd_swapsize '${swap}' --motd_rootsize '${size}'\""
-    
+
     $opt_role = $real_roles ? {
         ''      => '',
         default => inline_template("--role=<%= real_roles.join(',') %> ${motd_role_args}")
@@ -196,11 +197,11 @@ define xen::domU (
     # The final command
     $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}'"
 
-    
+
     # stage one: ensure the domU exists
     case $ensure {
         'present', 'running', 'stopped': {
-            
+
             exec { "xen_create_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
                 command => "${xen_create_image_cmd}",
@@ -224,7 +225,16 @@ define xen::domU (
                             Exec["xen_create_${domU_hostname}"]
                             ]
             }
-            
+
+            # # Prepare the snapshot config file
+            # file { "${domU_snapshot_configfile}":
+            #     ensure  => 'file',
+            #     owner   => "${xen::params::configfile_owner}",
+            #     group   => "${xen::params::configfile_group}",
+            #     mode    => '0644',
+            #     require => File["${domU_configfile}"]
+            # }
+
             file { "${domU_infofile}":
                 ensure  => 'file',
                 replace => false,
@@ -249,7 +259,7 @@ define xen::domU (
                             Exec["xen_shutdown_${domU_hostname}"]
                             ]
             }
-           
+
             file { [ "${domU_configfile}", "${domU_infofile}" ]:
                 ensure  => "${ensure}",
                 require => Exec["xen_delete_${domU_hostname}"]
@@ -259,7 +269,7 @@ define xen::domU (
     }
 
     # Store the access information (root password etc.)
-    File["${domU_infofile}"]{        
+    File["${domU_infofile}"]{
         owner   => 'root',
         group   => 'root',
         mode    => '0400',
