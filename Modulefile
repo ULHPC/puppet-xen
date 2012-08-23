@@ -1,5 +1,5 @@
 name    'xen'
-version '0.1.0'
+version '0.1.1'
 source  'git-admin.uni.lu:puppet-repo.git'
 author  'Sebastien Varrette (Sebastien.Varrette@uni.lu)'
 license 'GPL v3'
@@ -8,7 +8,7 @@ description  'Configure and manage the Xen'
 project_page 'UNKNOWN'
 
 ## List of the classes defined in this module
-classes     'xen::common, xen::dom0, xen::dom0::common, xen::dom0::debian, xen::dom0::redhat, xen::params'
+classes     'xen::dom0, xen::dom0::common, xen::dom0::debian, xen::dom0::redhat, xen::params'
 ## List of the definitions defined in this module
 definitions 'sysctl'
 
