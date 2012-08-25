@@ -205,7 +205,8 @@ define xen::domU (
             exec { "xen_create_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
                 command => "${xen_create_image_cmd}",
-                creates => "/dev/mapper/${xen::dom0::domU_lvm}-${domU_hostname}--disk",
+                #creates => "/dev/mapper/${xen::dom0::domU_lvm}-${domU_hostname}--disk",
+                creates => "${domU_configfile}",
                 timeout => $timeout,
                 require => [
                             Package['xen-tools'],
