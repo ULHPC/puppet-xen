@@ -226,7 +226,24 @@ define xen::domU (
                             ]
             }
 
-            # # Prepare the snapshot config file
+            # Prepare the snapshot config file
+            # exec { "cp ${domU_configfile} ${domU_snapshot_configfile}":
+            #     path    => "/usr/bin:/usr/sbin:/bin:/sbin",
+            #     creates => "${domU_snapshot_configfile}",
+            #     user    => "${xen::params::configfile_owner}",
+            #     group   => "${xen::params::configfile_group}",
+            #     require => File["${domU_configfile}"]
+            # }
+
+            exec { "Adapting ${domU_snapshot_configfile}":
+                command => "sed 's/${xen::dom0::domU_lvm}\/${domU_hostname}-disk/${xen::dom0::domU_lvm}\/${domU_hostname}-snapshot-disk/' ${domU_configfile} >  ${domU_snapshot_configfile}",
+                path    => "/usr/bin:/usr/sbin:/bin:/sbin",
+                user    => "${xen::params::configfile_owner}",
+                group   => "${xen::params::configfile_group}",
+                require => File["${domU_configfile}"]
+            }
+
+            # replace the LVM disk in ${domU_snapshot_configfile}
             # file { "${domU_snapshot_configfile}":
             #     ensure  => 'file',
             #     owner   => "${xen::params::configfile_owner}",
@@ -260,7 +277,7 @@ define xen::domU (
                             ]
             }
 
-            file { [ "${domU_configfile}", "${domU_infofile}" ]:
+            file { [ "${domU_configfile}", "${domU_snapshot_configfile}", "${domU_infofile}" ]:
                 ensure  => "${ensure}",
                 require => Exec["xen_delete_${domU_hostname}"]
             }
