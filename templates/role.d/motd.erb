@@ -48,6 +48,7 @@ logMessage Script $0 starting
 DOMO=<%= fqdn %>
 DOMO_HOSTNAME=<%= hostname %>
 DOMU_HOSTNAME=''
+DOMU_DOMAIN=`hostname -f | cut -d '.' -f 2`
 MSG1="Xen DomU"
 MSG2=""
 NETINFO=""
@@ -60,6 +61,7 @@ while [ $# -ge 1 ]; do
         --motd_msg1)      shift; MSG1=$1;;
         --motd_msg2)      shift; MSG2=$1;;
         --motd_hostname)  shift; DOMU_HOSTNAME=$1;;
+        --motd_domain)    shift; DOMU_DOMAIN=$1;;
         --motd_netinfo)   shift; NETINFO=$1;;
         --motd_vcpus)     shift; VCPUs=$1;;
         --motd_ramsize)   shift; RAMSIZE=$1;;
@@ -95,7 +97,7 @@ fi
 # Now start the new motd file
 cat <<MOTD_TAIL_EOF > ${prefix}/${MOTD_TAIL}
 ======================================================================================
- Welcome to ${DOMU_HOSTNAME}
+ Welcome to ${DOMU_HOSTNAME}.${DOMU_DOMAIN}
 ======================================================================================
 MOTD_TAIL_EOF
 
