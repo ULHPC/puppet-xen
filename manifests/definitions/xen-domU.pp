@@ -148,7 +148,7 @@ define xen::domU (
         default => "IP: ${ip}"
     }
 
-    $motd_role_args = "--role-args=\"--motd_hostname '${domU_hostname}' --motd_msg1 '${desc}' --motd_netinfo '${motd_netinfo}' --motd_vcpus ${vcpus} --motd_ramsize '${ramsize}' --motd_swapsize '${swap}' --motd_rootsize '${size}'\""
+    $motd_role_args = "--role-args=\"--motd_hostname '${domU_hostname}' --motd_domain '${domain}' --motd_msg1 '${desc}' --motd_netinfo '${motd_netinfo}' --motd_vcpus ${vcpus} --motd_ramsize '${ramsize}' --motd_swapsize '${swap}' --motd_rootsize '${size}'\""
 
     $opt_role = $real_roles ? {
         ''      => '',
