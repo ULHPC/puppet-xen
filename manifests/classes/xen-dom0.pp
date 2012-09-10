@@ -166,7 +166,7 @@ class xen::dom0::common {
         mode    => "${xen::params::configdir_mode}",
         require => File["${xen::params::configdir}"]
     }
-    
+
     # Configure the network bridge file
     file { "${xen::params::scriptsdir}/${hostname}-network-bridge":
         ensure  => 'file',
@@ -197,9 +197,9 @@ class xen::dom0::common {
         mode    => "${xen::params::configfile_mode}",
         content => template("xen/xend-config.sxp.erb"),
         require => File["${xen::params::configdir}"],
-        notify  => Service['xen']        
+        notify  => Service['xen']
     }
-    
+
 
     # Under squeeze: You have to patch the network script!
     if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'squeeze' ) {
@@ -255,17 +255,21 @@ class xen::dom0::common {
         content => template('xen/role.d/motd.erb'),
         require => File["${xen::params::roledir}"]
     }
-   
+
     # Prepare the skeleton directory
     file { "${xen::params::skeldir}":
         ensure => 'directory',
         owner   => "${xen::params::configdir_owner}",
         group   => "${xen::params::configdir_group}",
         mode    => "${xen::params::configdir_mode}",
+        source  => "puppet:///modules/xen/xen-tools/skel",
+        recurse => true,
         require => File["${xen::params::toolsdir}"]
     }
 
+
     
+
     # Prepare eventually the SSH keys for the root user
     if !defined( Ssh::Keygen['root']) {
 
@@ -277,18 +281,15 @@ class xen::dom0::common {
     }
 
     # Populate the skeleton directory
-    file { [
-            "${xen::params::skeldir}/etc",
-            "${xen::params::skeldir}/root",
-            ]:
-                ensure => 'directory',
-                owner   => 'root',
-                group   => 'root', 
-                mode    => "${xen::params::configdir_mode}",
-                require => File["${xen::params::skeldir}"]
+    file { "${xen::params::skeldir}/root/.ssh/authorized_keys": 
+        ensure => 'link',
+        target => "/etc/skel/.ssh/authorized_keys",
+        require => File["${xen::params::skeldir}"]
     }
 
-    # The final service 
+    
+    
+    # The final service
     service { 'xen':
         name       => "${xen::params::servicename}",
         enable     => true,
@@ -313,30 +314,30 @@ class xen::dom0::common {
 # Specialization class for Debian systems
 class xen::dom0::debian inherits xen::dom0::common {
 
+    # Bug fix on error: "net.bridge.bridge-nf-call-iptables" is an unknown key
+    include kernel
+    kernel::module { 'bridge':
+        ensure => 'present'
+    }
+
     # Disable bridge filtering
     # net.bridge.bridge-nf-call-arptables = 0
     # net.bridge.bridge-nf-call-ip6tables = 0
     # net.bridge.bridge-nf-call-iptables = 0
     # net.bridge.bridge-nf-filter-vlan-tagged = 0
 
-    include sysctl
-    sysctl::value { "net.bridge.bridge-nf-call-arptables":
-        value => '0',
-        ensure => "${xen::dom0::ensure}"
-    }
-    sysctl::value { "net.bridge.bridge-nf-call-ip6tables":
-        value => '0',
-        ensure => "${xen::dom0::ensure}"
-    }
-    sysctl::value { "net.bridge.bridge-nf-call-iptables":
-        value => '0',
-        ensure => "${xen::dom0::ensure}"
-    }
-    sysctl::value { "net.bridge.bridge-nf-filter-vlan-tagged":
-        value => '0',
-        ensure => "${xen::dom0::ensure}"
-    }
 
+    include sysctl
+    sysctl::value { [
+                     "net.bridge.bridge-nf-call-arptables",
+                     "net.bridge.bridge-nf-call-ip6tables",
+                     "net.bridge.bridge-nf-call-iptables",
+                     "net.bridge.bridge-nf-filter-vlan-tagged"
+                     ]:
+                         value  => '0',
+                         ensure  => "${xen::dom0::ensure}",
+                         require => Kernel::Module['bridge']
+    }
 }
 
 # ------------------------------------------------------------------------------
