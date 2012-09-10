@@ -59,11 +59,11 @@ define xen::domU (
     $size       = $xen::params::domU_size,
     $ramsize    = $xen::params::domU_memory,
     $swap       = $xen::params::domU_swap,
-    $gateway    = $xen::params::domU_gateway,
-    $netmask    = $xen::params::domU_netmask,
-    $broadcast  = $xen::params::domU_broadcast,
-    $arch       = $xen::params::domU_arch,
     $roles      = $xen::params::domU_roles,
+    $gateway    = '',
+    $netmask    = '',
+    $broadcast  = '',
+    $arch       = $xen::params::domU_arch,
     $desc       = '',
     $do_force   = false,
     $ip         = '',
@@ -120,6 +120,24 @@ define xen::domU (
         }
     }
 
+    # Collect the domU specific values
+    $domU_gateway = $gateway ? {
+        ''      => "${xen::dom0::domU_gateway}",
+        default => "${gateway}"
+    }
+    $domU_netmask = $netmask ? {
+        ''      => "${xen::dom0::domU_netmask}",
+        default => "${netmask}"
+    }
+    $domU_broadcast = $broadcast ? {
+        ''      => "${xen::dom0::domU_broadcast}",
+        default => "${broadcast}"
+    }
+    $domU_arch = $arch ? {
+        ''      => "${xen::dom0::domU_arch}",
+        default => "${arch}"
+    }
+    
     # Now prepare the option lines for xen-create-image
     $opt_swap = $swap ? {
         ''      => '--noswap',
@@ -176,17 +194,17 @@ define xen::domU (
         ''      => '',
         default => "--mac=${mac}"
     }
-    $opt_netmask = $netmask ? {
+    $opt_netmask = $domU_netmask ? {
         ''      => '',
-        default => "--netmask=${netmask}"
+        default => "--netmask=${domU_netmask}"
     }
-    $opt_broadcast = $broadcast ? {
+    $opt_broadcast = $domU_broadcast ? {
         ''      => '',
-        default => "--broadcast=${broadcast}"
+        default => "--broadcast=${domU_broadcast}"
     }
-    $opt_gateway = $gateway ? {
+    $opt_gateway = $domU_gateway ? {
         ''      => '',
-        default => "--gateway=${gateway}"
+        default => "--gateway=${domU_gateway}"
     }
     # The complete network configuration option
     $opt_network_config = $ip ? {
@@ -195,7 +213,7 @@ define xen::domU (
     }
 
     # The final command
-    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}'"
+    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}'"
 
 
     # stage one: ensure the domU exists
