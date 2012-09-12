@@ -19,8 +19,8 @@ General Information
     Hostname       :  <%= domU_hostname %>
     Distribution   :  <%= dist %> (<%= arch %> architecture)
     Mirror         :  http://debian.mirror.root.lu/debian/
-    Partitions     :  swap <%= swap %> (swap) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>--swap
-                      /    <%= size %> (ext3) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>--disk
+    Partitions     :  swap <%= swap %> (swap) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-swap
+                      /    <%= size %> (ext3) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-disk
     Image type     :  full
     Virtual CPUs   :  <%= vcpus %>
     Memory size    :  <%= ramsize %>
@@ -31,9 +31,9 @@ Networking Information
 
 <% if ip != '' %>
     IP Address 1   : <%= ip %> 
-    Netmask        : <%= netmask %>
-    Broadcast      : <%= broadcast %>
-    Gateway        : <%= gateway %>
+    Netmask        : <%= domU_netmask %>
+    Broadcast      : <%= domU_broadcast %>
+    Gateway        : <%= domU_gateway %>
 <% else %>
     DHCP
 <% end %>
