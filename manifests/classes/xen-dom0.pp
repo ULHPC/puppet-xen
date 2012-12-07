@@ -113,6 +113,7 @@ class xen::dom0::common {
 
     # Configure Grub to first load Xen:
     exec { "mv ${xen::params::grubconfdir}/10_linux ${xen::params::grubconfdir}/50_linux":
+        path    => "/usr/bin:/usr/sbin:/bin",
         unless  => "test -f ${xen::params::grubconfdir}/50_linux",
         notify  => Exec["${xen::params::updategrub}"],
         creates => "${xen::params::grubconfdir}/50_linux",
