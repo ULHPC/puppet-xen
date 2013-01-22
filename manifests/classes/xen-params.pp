@@ -131,7 +131,7 @@ class xen::params {
 
     # List of the specified role script(s) post-install.
     $domU_roles = $xen_domU_roles ? {
-        ''      => [ 'udev', 'puppet' ],
+        ''      => [ 'udev' ],
         default => $xen_domU_roles
     }
 
@@ -238,16 +238,6 @@ class xen::params {
     $roledir = $::operatingsystem ? {
         default => "${toolsdir}/role.d",
     }
-
-
-
-
-
-    # $pkgmanager = $::operatingsystem ? {
-    #     /(?i-mx:ubuntu|debian)/           => [ '/usr/bin/apt-get' ],
-    #     /(?i-mx:centos|fedora|redhat)/ => [ '/bin/rpm', '/usr/bin/up2date', '/usr/bin/yum' ],
-    #     default => []
-    # }
 
 
 }
