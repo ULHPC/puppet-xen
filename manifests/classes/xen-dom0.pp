@@ -13,6 +13,8 @@
 # $ensure:: *Default*: 'present'. Ensure the presence (or absence) of xen
 # $bridge_on:: *Default*: eth1'.  List of the interfaces on which a network
 #     bridge should be configured
+# $if_shared:: *Default*: empty. Interface used for the Dom0, and as a network
+#     bridge
 # $domU_lvm:: *Default*: 'vg_${hostname}_domU'. LVM volume group to use for
 #     hosting domU disk image
 # $domU_size:: *Default*: '10Gb'.
@@ -50,6 +52,7 @@
 class xen::dom0(
     $ensure         = $xen::params::ensure,
     $bridge_on      = $xen::params::bridge_on,
+    $if_shared      = '',
     $domU_lvm       = $xen::params::domU_lvm,
     $domU_size      = $xen::params::domU_size,
     $domU_memory    = $xen::params::domU_memory,
@@ -178,8 +181,10 @@ class xen::dom0::common {
         require => File["${xen::params::scriptsdir}"]
     }
 
+    $if_bridge = array_del($xen::dom0::bridge_on, $if_shared)
+
     # Configure the interface in manual mode
-    network::interface { $xen::dom0::bridge_on :
+    network::interface { $if_bridge :
         comment => "Activate the interface yet without any specific IP/configuration \n# Required for Xen bridge configuration",
         auto    => false,
         manual  => true,
@@ -262,14 +267,14 @@ class xen::dom0::common {
     }
 
     # Populate the skeleton directory
-    file { "${xen::params::skeldir}/root/.ssh/authorized_keys": 
+    file { "${xen::params::skeldir}/root/.ssh/authorized_keys":
         ensure => 'link',
         target => "/etc/skel/.ssh/authorized_keys",
         require => File["${xen::params::skeldir}"]
     }
 
-    
-    
+
+
     # The final service
     service { 'xen':
         name       => "${xen::params::servicename}",
