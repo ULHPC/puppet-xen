@@ -52,7 +52,7 @@
 class xen::dom0(
     $ensure         = $xen::params::ensure,
     $bridge_on      = $xen::params::bridge_on,
-    $if_shared      = '',
+    $if_shared      = $xen::params::if_shared,
     $domU_lvm       = $xen::params::domU_lvm,
     $domU_size      = $xen::params::domU_size,
     $domU_memory    = $xen::params::domU_memory,

@@ -41,6 +41,12 @@ class xen::params {
         default => $xen_bridge_on
     }
 
+    # List the interfaces, used at the same time as a bridge and for the dom0
+    $if_shared = $xen_if_shared ? {
+        ''      => '',
+        default => $xen_if_shared
+    }
+
     # Use the pygrub wrapper such that each VM manage its own kernel and don't
     # use the one of the Xen dom0
     $domU_use_pygrub = $xen_domU_use_pygrub ? {
