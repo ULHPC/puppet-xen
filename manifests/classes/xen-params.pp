@@ -136,27 +136,40 @@ class xen::params {
     }
 
 
-
     #### MODULE INTERNAL VARIABLES  #########
     # (Modify to adapt to unsupported OSes)
     #######################################
-    $packagename = $::operatingsystem ? {
-        default => 'xen-hypervisor-4.0-amd64'
+    $packagename = $lsbdistcodename ? {
+        'squeeze' => 'xen-hypervisor-4.0-amd64',
+        'wheezy'  => 'xen-hypervisor-4.1-amd64',
+        default   => 'xen-hypervisor-4.1-amd64'
     }
 
-    $kernel_package = $::operatingsystem ? {
-        default => 'linux-image-2.6-xen-amd64'
+    $kernel_package = $lsbdistcodename ? {
+        'squeeze' => 'linux-image-2.6-xen-amd64',
+        'wheezy'  => 'linux-image-3.2.0-4-amd64',
+        default   => 'linux-image-3.2.0-4-amd64'
     }
 
-    $utils_packages = $::operatingsystem ? {
-        default => [
-                    'xen-tools',
-                    'xen-utils-4.0'
-                    ]
+    $utils_packages = $lsbdistcodename ? {
+        'squeeze' => [
+                     'xen-tools',
+                     'xen-utils-4.0'
+                     ],
+        'wheezy'  => [
+                     'xen-tools',
+                     'xen-utils-4.1'
+                     ],
+        default   => [
+                     'xen-tools',
+                     'xen-utils-4.1'
+                     ]
     }
 
-    $servicename = $::operatingsystem ? {
-        default  => 'xend'
+    $servicename = $lsbdistcodename ? {
+        'squeeze' => 'xend',
+        'wheezy'  => 'xen',
+        default   => 'xend'
     }
 
     # used for pattern in a service ressource

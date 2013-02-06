@@ -69,7 +69,7 @@ inherits xen::params
 
     case $::operatingsystem {
         debian, ubuntu:         { include xen::dom0::debian }
-        redhat, fedora, centos: { include xen::dom0::redhat }
+    #   redhat, fedora, centos: { include xen::dom0::redhat }
         default: {
             fail("Module $module_name is not supported on $operatingsystem")
         }
@@ -202,26 +202,6 @@ class xen::dom0::common {
     }
 
 
-    # Under squeeze: You have to patch the network script!
-    if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'squeeze' ) {
-        $patchfile = '/tmp/network-bridge.patch'
-        file { "${patchfile}":
-            ensure => 'file',
-            source => 'puppet:///modules/xen/squeeze-network-bridge.patch',
-            owner  => 'root',
-            group  => 'root',
-            mode   => '0644'
-        }
-
-        exec { 'patch Xen network-brige':
-            command  => "patch -p0 -i ${patchfile}",
-            path     => "/usr/bin:/usr/sbin:/bin",
-            user     => 'root',
-            onlyif   => "grep '[ -n \"$gateway\" ] && ip route add default via ${gateway}' ${xen::params::scriptsdir}/network-bridge",
-            require  => File["${patchfile}"]
-        }
-    }
-
     # Configure xen-tools
     file { "${xen::params::toolsdir}":
         ensure => 'directory',
@@ -269,7 +249,7 @@ class xen::dom0::common {
     }
 
 
-    
+
 
     # Prepare eventually the SSH keys for the root user
     if !defined( Ssh::Keygen['root']) {
@@ -339,13 +319,25 @@ class xen::dom0::debian inherits xen::dom0::common {
                          ensure  => "${xen::dom0::ensure}",
                          require => Kernel::Module['bridge']
     }
+
+    # Under squeeze: You have to patch the network script!
+    if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'squeeze' ) {
+        $patchfile = '/tmp/network-bridge.patch'
+        file { "${patchfile}":
+            ensure => 'file',
+            source => 'puppet:///modules/xen/squeeze-network-bridge.patch',
+            owner  => 'root',
+            group  => 'root',
+            mode   => '0644'
+        }
+
+        exec { 'patch Xen network-brige':
+            command  => "patch -p0 -i ${patchfile}",
+            path     => "/usr/bin:/usr/sbin:/bin",
+            user     => 'root',
+            onlyif   => "grep '[ -n \"$gateway\" ] && ip route add default via ${gateway}' ${xen::params::scriptsdir}/network-bridge",
+            require  => File["${patchfile}"]
+        }
+    }
 }
-
-# ------------------------------------------------------------------------------
-# = Class: xen::dom0::redhat
-#
-# Specialization class for Redhat systems
-class xen::dom0::redhat inherits xen::dom0::common { }
-
-
 
