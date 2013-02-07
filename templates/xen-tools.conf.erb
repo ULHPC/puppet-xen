@@ -40,7 +40,7 @@
 #
 #  New instances will be stored in subdirectories named after their
 # hostnames.
-# 
+#
 ##
 # dir = /home/xen
 #
@@ -48,7 +48,7 @@
 #
 ##
 #
-# If you don't wish to use loopback images then you may specify an 
+# If you don't wish to use loopback images then you may specify an
 # LVM volume group here instead
 #
 ##
@@ -77,7 +77,7 @@ lvm = <%= domU_lvm %>
 #
 ##
 #
-# 
+#
 # install-method = [ debootstrap | rinse | rpmstrap | copy | tar ]
 #
 #
@@ -100,7 +100,7 @@ install-method = debootstrap
 #  Command definitions.
 ##
 #
-# The "rinse", and "rpmstrap" commands are hardwired into 
+# The "rinse", and "rpmstrap" commands are hardwired into
 # the script, but if you wish to modify the commands which are executed
 # when installing new systems by a "copy", "debootstrap", or "tar" method
 # you can do so here:
@@ -130,7 +130,7 @@ size   = <%= domU_size   %>    # Disk image size.
 memory = <%= domU_memory %>   # Memory size
 swap   = <%= domU_swap   %>   # Swap size
 # noswap = 1      # Don't use swap at all for the new system.
-fs     = ext3     # use the EXT3 filesystem for the disk image.
+fs     = ext4     # use the EXT4 filesystem for the disk image.
 dist   = `xt-guess-suite-and-mirror --suite` # Default distribution to install.
 image  = sparse   # Specify sparse vs. full disk images.
 
@@ -173,7 +173,7 @@ broadcast  = <%= domU_broadcast %>
 # for guests.
 #
 # bridge = xendmz
-bridge = br<%= bridge_on[0] %> 
+bridge = br<%= bridge_on[0] %>
 #
 
 ##
@@ -237,8 +237,8 @@ bridge = br<%= bridge_on[0] %>
 #kernel = /boot/vmlinuz-`uname -r`
 #initrd = /boot/initrd.img-`uname -r`
 #
-# OR let xen-create-image use pygrub, so that the grub from the VM is used, 
-# which means you no longer need to store kernels outside the VMs. 
+# OR let xen-create-image use pygrub, so that the grub from the VM is used,
+# which means you no longer need to store kernels outside the VMs.
 # Keeps things very flexible.
 pygrub = 1
 
@@ -329,7 +329,7 @@ btrfs_options    = defaults
 #
 # output    = /etc/xen
 # extension = .cfg
-# 
+#
 
 #
 #  Here you can control weather your dom0's /etc/hosts file should be
