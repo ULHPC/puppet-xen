@@ -8,7 +8,7 @@
 ################################################################################
 
 Xen DomU generated on the Xen Dom0 `<%= scope.lookupvar('::hostname') %>` using the Puppet class
-`xen::domU`. The following command was used: 
+`xen::domU`. The following command was used:
 
        $> <%= xen_create_image_cmd %>
 
@@ -18,7 +18,7 @@ General Information
 
     Hostname       :  <%= domU_hostname %>
     Distribution   :  <%= dist %> (<%= arch %> architecture)
-    Mirror         :  http://debian.mirror.root.lu/debian/
+    Mirror         :  http://ftp.fr.debian.org/debian/
     Partitions     :  swap <%= swap %> (swap) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-swap
                       /    <%= size %> (ext3) on /dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-disk
     Image type     :  full
@@ -30,7 +30,7 @@ Networking Information
 ----------------------
 
 <% if ip != '' %>
-    IP Address 1   : <%= ip %> 
+    IP Address 1   : <%= ip %>
     Netmask        : <%= domU_netmask %>
     Broadcast      : <%= domU_broadcast %>
     Gateway        : <%= domU_gateway %>
