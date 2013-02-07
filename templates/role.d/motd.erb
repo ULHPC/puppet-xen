@@ -14,9 +14,10 @@ prefix=$1
 shift
 
 MOTD_TAIL="/etc/motd.tail"
+MOTD="/etc/motd"
 
 print_usage() {
-    cat <<EOF 
+    cat <<EOF
     $0 <prefix> [--motd_hostname "domU_hostname"] \
                 [--motd_mgs1 "message 1"] \
                 [--motd_mgs2 "message 2"] \
@@ -74,7 +75,7 @@ done
 # cat <<EOF
 #  - DomU hostname= ${DOMU_HOSTNAME}
 #  - MSG1: ${MSG1}
-#  - MSG2: ${MSG2} 
+#  - MSG2: ${MSG2}
 #  - Netinfo: ${NETINFO}
 #  - VCPUs: ${VCPUs}
 #  - RAMSIZE: ${RAMSIZE}
@@ -101,10 +102,10 @@ cat <<MOTD_TAIL_EOF > ${prefix}/${MOTD_TAIL}
 ======================================================================================
 MOTD_TAIL_EOF
 
-if [ -n "$MSG1" ]; then 
+if [ -n "$MSG1" ]; then
     figlet -w 80 -c "${MSG1}" >>  ${prefix}/${MOTD_TAIL}
 fi
-if [ -n "$MSG2" ]; then 
+if [ -n "$MSG2" ]; then
     figlet -w 80 -c "${MSG2}" >>  ${prefix}/${MOTD_TAIL}
 fi
 
@@ -115,7 +116,7 @@ cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
     vCPUs....... ${VCPUs}
     RAM size.... ${RAMSIZE}
     Partitions.. swap (${SWAPSIZE})
-                 /    (ext3,${SIZE})   
+                 /    (ext4,${SIZE})
 MOTD_TAIL_EOF
 
 if [ -n "${NETINFO}" ]; then
@@ -130,6 +131,7 @@ cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
 ======================================================================================
 MOTD_TAIL_EOF
 
+cp ${prefix}/${MOTD_TAIL} ${prefix}/${MOTD}
 
 #
 #  Log our finish
