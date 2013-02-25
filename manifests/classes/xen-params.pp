@@ -47,7 +47,7 @@ class xen::params {
         default => $xen_if_shared
     }
 
-    # Use the pygrub wrapper such that each VM manage its own kernel and don't
+    # Use the pygrub wrapper such that each VM manages its own kernel and does not
     # use the one of the Xen dom0
     $domU_use_pygrub = $xen_domU_use_pygrub ? {
         ''      => true,
