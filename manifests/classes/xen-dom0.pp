@@ -325,7 +325,7 @@ class xen::dom0::debian inherits xen::dom0::common {
                          require => Kernel::Module['bridge']
     }
 
-    # Under squeeze: You have to patch the network script!
+    # Debian Squeeze: patch the network script!
     if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'squeeze' ) {
         $patchfile = '/tmp/network-bridge.patch'
         file { "${patchfile}":
@@ -341,6 +341,26 @@ class xen::dom0::debian inherits xen::dom0::common {
             path     => "/usr/bin:/usr/sbin:/bin",
             user     => 'root',
             onlyif   => "grep '[ -n \"$gateway\" ] && ip route add default via ${gateway}' ${xen::params::scriptsdir}/network-bridge",
+            require  => File["${patchfile}"]
+        }
+    }
+
+    # Debian Wheezy: patch the network script!
+    if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'wheezy' ) {
+        $patchfile = '/tmp/network-bridge.patch'
+        file { "${patchfile}":
+            ensure => 'file',
+            source => 'puppet:///modules/xen/wheezy-network-bridge.patch',
+            owner  => 'root',
+            group  => 'root',
+            mode   => '0644'
+        }
+
+        exec { 'patch Xen network-brige':
+            command  => "patch -p0 -i ${patchfile}",
+            path     => "/usr/bin:/usr/sbin:/bin",
+            user     => 'root',
+            onlyif   => "grep 'brctl show | wc -l' ${xen::params::scriptsdir}/network-bridge",
             require  => File["${patchfile}"]
         }
     }
