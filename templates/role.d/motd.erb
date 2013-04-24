@@ -89,6 +89,10 @@ installDebianPackage ${prefix} figlet
 installDebianPackage ${prefix} bash-completion
 installDebianPackage ${prefix} git-core          # For __git-ps1
 
+# Backup the old /etc/motd file
+if [ -f "${prefix}/${MOTDL}" ]; then
+    cp ${prefix}/${MOTD} ${prefix}/${MOTD}.old
+fi
 
 # Backup the old /etc/motd.tail file
 if [ -f "${prefix}/${MOTD_TAIL}" ]; then
@@ -131,7 +135,7 @@ cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
 ======================================================================================
 MOTD_TAIL_EOF
 
-cp ${prefix}/${MOTD_TAIL} ${prefix}/${MOTD}
+# cp ${prefix}/${MOTD_TAIL} ${prefix}/${MOTD}
 
 #
 #  Log our finish
