@@ -15,6 +15,8 @@
 #     bridge should be configured
 # $if_shared:: *Default*: empty. Interface used for the Dom0, and as a network
 #     bridge
+# $dom0_memory:: *Default*: empty. Set the memory (in MB) for the Dom0, and
+#     disable dom0 ballooning
 # $domU_lvm:: *Default*: 'vg_${hostname}_domU'. LVM volume group to use for
 #     hosting domU disk image
 # $domU_size:: *Default*: '10Gb'.
@@ -53,6 +55,7 @@ class xen::dom0(
     $ensure         = $xen::params::ensure,
     $bridge_on      = $xen::params::bridge_on,
     $if_shared      = $xen::params::if_shared,
+    $dom0_mem       = $xen::params::dom0_mem,
     $domU_lvm       = $xen::params::domU_lvm,
     $domU_size      = $xen::params::domU_size,
     $domU_memory    = $xen::params::domU_memory,
@@ -138,6 +141,15 @@ class xen::dom0::common {
         changes => "set GRUB_DISABLE_OS_PROBER 'true'",
         onlyif  => "get GRUB_DISABLE_OS_PROBER  != 'true'",
         notify => Exec['update-grub']
+    }
+
+    if ($dom0_mem != '') {
+        augeas { "/etc/default/grub/GRUB_CMDLINE_XEN":
+            context => "/files//etc/default/grub",
+            changes => "set GRUB_CMDLINE_XEN '\"dom0_mem=${xen::dom0::dom0_mem}M,max:${xen::dom0::dom0_mem}M no-bootscrub\"'",
+            onlyif  => "get GRUB_CMDLINE_XEN  != '\"dom0_mem=${xen::dom0::dom0_mem}M,max:${xen::dom0::dom0_mem}M no-bootscrub\"'",
+            notify => Exec['update-grub']
+        }
     }
 
     # reboot is mandatory at this level.

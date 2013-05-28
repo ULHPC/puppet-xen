@@ -47,6 +47,12 @@ class xen::params {
         default => $xen_if_shared
     }
 
+    # Memory for the dom0 (MB)
+    $dom0_mem = $xen_dom0_mem ? {
+        ''      => '',
+        default => $xen_dom0_mem
+    }
+
     # Use the pygrub wrapper such that each VM manages its own kernel and does not
     # use the one of the Xen dom0
     $domU_use_pygrub = $xen_domU_use_pygrub ? {

@@ -199,11 +199,11 @@
 # dom0-min-mem is the lowest permissible memory level (in MB) for dom0.
 # This is a minimum both for auto-ballooning (as enabled by
 # enable-dom0-ballooning below) and for xm mem-set when applied to dom0.
-(dom0-min-mem 196)
+(dom0-min-mem <%= scope.lookupvar('xen::dom0::dom0_mem').empty? ? '512' : scope.lookupvar('xen::dom0::dom0_mem') %>)
 
 # Whether to enable auto-ballooning of dom0 to allow domUs to be created.
 # If enable-dom0-ballooning = no, dom0 will never balloon out.
-(enable-dom0-ballooning yes)
+(enable-dom0-ballooning <%= scope.lookupvar('xen::dom0::dom0_mem').empty? ? 'yes' : 'no' %>)
 
 # 32-bit paravirtual domains can only consume physical
 # memory below 168GB. On systems with memory beyond that address,
