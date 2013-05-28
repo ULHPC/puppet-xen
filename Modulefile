@@ -1,5 +1,5 @@
 name    'xen'
-version '0.2.4'
+version '0.2.5'
 source  'git-admin.uni.lu:puppet-repo.git'
 author  'Hyacinthe Cartiaux (hyacinthe.cartiaux@uni.lu)'
 license 'GPL v3'
