@@ -137,7 +137,7 @@ define xen::domU (
         ''      => "${xen::dom0::domU_arch}",
         default => "${arch}"
     }
-    
+
     # Now prepare the option lines for xen-create-image
     $opt_swap = $swap ? {
         ''      => '--noswap',
@@ -177,6 +177,10 @@ define xen::domU (
         ''      => '',
         default => "--dist=${distrib}"
     }
+    $opt_install_method = $distrib ? {
+        'centos-6' => '--install-method=rinse',
+        default    => ''
+    }
     # Network stuff
     $opt_dhcp = $use_dhcp ? {
         true    => '--dhcp',
@@ -213,7 +217,7 @@ define xen::domU (
     }
 
     # The final command
-    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}'"
+    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} ${opt_install_method} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}' $opt_install_method"
 
 
     # stage one: ensure the domU exists
