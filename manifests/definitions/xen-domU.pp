@@ -15,7 +15,7 @@
 # == Parameters:
 #
 # [*ensure*]
-#   default to 'present', can be 'absent' or 'disabled'. The disabled status
+#   default to 'present', can be 'absent' or 'stopped'. The stopped status
 #   will shutdown the domU and ensure the symbolic link in /etc/xen/auto/ is
 #   removed.
 #   Default: 'present'
