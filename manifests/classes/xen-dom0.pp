@@ -160,11 +160,13 @@ class xen::dom0::common {
         context => '/files/etc/default/xendomains',
         changes => "set XENDOMAINS_SAVE '\"\"'",
         onlyif  => "get XENDOMAINS_SAVE != '\"\"'",
+        require => Package['xen']
     }
     augeas { "/etc/default/xendomains/XENDOMAINS_RESTORE":
         context => '/files/etc/default/xendomains',
         changes => "set XENDOMAINS_RESTORE 'false'",
         onlyif  => "get XENDOMAINS_RESTORE != 'false'",
+        require => Package['xen']
     }
 
     file { "${xen::params::scriptsdir}":
@@ -181,6 +183,12 @@ class xen::dom0::common {
         group   => "${xen::params::configdir_group}",
         mode    => "${xen::params::configdir_mode}",
         require => File["${xen::params::configdir}"]
+    }
+    augeas { "/etc/default/xendomains/XENDOMAINS_AUTO":
+        context => '/files/etc/default/xendomains',
+        changes => "set XENDOMAINS_AUTO '\"${xen::params::autodir}\"'",
+        onlyif  => "get XENDOMAINS_AUTO != '\"${xen::params::autodir}\"'",
+        require => Package['xen']
     }
 
     # Configure the network bridge file
