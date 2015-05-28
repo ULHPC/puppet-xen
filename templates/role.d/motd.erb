@@ -36,6 +36,8 @@ EOF
 #
 if [ -e /usr/lib/xen-tools/common.sh ]; then
     . /usr/lib/xen-tools/common.sh
+elif [ -e /usr/share/xen-tools/common.sh ]; then
+    . /usr/share/xen-tools/common.sh
 else
     echo "Installation problem"
 fi

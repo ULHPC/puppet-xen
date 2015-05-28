@@ -255,7 +255,7 @@ arch = <%= domU_arch %>
 #
 # The default mirror for debootstrap to install Debian-derived distributions
 #
-mirror = `xt-guess-suite-and-mirror --mirror`
+# mirror = `xt-guess-suite-and-mirror --mirror`
 
 #
 # A mirror suitable for use when installing the Dapper release of Ubuntu.
@@ -269,27 +269,37 @@ mirror = `xt-guess-suite-and-mirror --mirror`
 # default values used (for Debian the GeoIP feature is used, see
 # http://wiki.debian.org/DebianGeoMirror):
 #
-# mirror_sarge = http://archive.debian.org/debian
-# mirror_etch = http://archive.debian.org/debian
-# mirror_lenny = http://cdn.debian.net/debian
-# mirror_squeeze = http://cdn.debian.net/debian
-# mirror_wheezy = http://cdn.debian.net/debian
-# mirror_sid = http://cdn.debian.net/debian
-# mirror_dapper = http://archive.ubuntu.com/ubuntu
-# mirror_edgy = http://old-releases.ubuntu.com/ubuntu
-# mirror_feisty = http://old-releases.ubuntu.com/ubuntu
-# mirror_gutsy = http://old-releases.ubuntu.com/ubuntu
-# mirror_hardy = http://archive.ubuntu.com/ubuntu
-# mirror_intrepid = http://old-releases.ubuntu.com/ubuntu
-# mirror_karmic = http://archive.ubuntu.com/ubuntu
-# mirror_lucid = http://archive.ubuntu.com/ubuntu
-# mirror_maverick = http://archive.ubuntu.com/ubuntu
-# mirror_natty = http://archive.ubuntu.com/ubuntu
-
+mirror_sarge = http://archive.debian.org/debian
+mirror_etch = http://archive.debian.org/debian
+mirror_lenny = http://archive.debian.org/debian
+mirror_squeeze = http://http.debian.net/debian
+mirror_wheezy = http://http.debian.net/debian
+mirror_jessie = http://http.debian.net/debian
+mirror_sid = http://http.debian.net/debian
+mirror_dapper = http://old-releases.ubuntu.com/ubuntu
+mirror_edgy = http://old-releases.ubuntu.com/ubuntu
+mirror_feisty = http://old-releases.ubuntu.com/ubuntu
+mirror_gutsy = http://old-releases.ubuntu.com/ubuntu
+mirror_hardy = http://old-releases.ubuntu.com/ubuntu
+mirror_intrepid = http://old-releases.ubuntu.com/ubuntu
+mirror_jaunty = http://old-releases.ubuntu.com/ubuntu
+mirror_karmic = http://old-releases.ubuntu.com/ubuntu
+mirror_lucid = http://archive.ubuntu.com/ubuntu
+mirror_maverick = http://old-releases.ubuntu.com/ubuntu
+mirror_natty = http://old-releases.ubuntu.com/ubuntu
+mirror_oneiric = http://archive.ubuntu.com/ubuntu
+mirror_precise = http://archive.ubuntu.com/ubuntu
+mirror_quantal = http://old-releases.ubuntu.com/ubuntu
+mirror_raring = http://old-releases.ubuntu.com/ubuntu
+mirror_saucy = http://old-releases.ubuntu.com/ubuntu
+mirror_trusty = http://archive.ubuntu.com/ubuntu
+mirror_utopic = http://archive.ubuntu.com/ubuntu
+mirror_vivid = http://archive.ubuntu.com/ubuntu
 
 #
 #  Filesystem options for the different filesystems we support.
 #
+ext4_options     = noatime,nodiratime,errors=remount-ro
 ext3_options     = noatime,nodiratime,errors=remount-ro
 ext2_options     = noatime,nodiratime,errors=remount-ro
 xfs_options      = defaults

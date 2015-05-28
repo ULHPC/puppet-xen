@@ -98,13 +98,14 @@ class xen::dom0::common {
     }
 
     package { 'xen':
-        name    => "${xen::params::packagename}",
         ensure  => "${xen::dom0::ensure}",
+        name    => "${xen::params::packagename}",
         require => Package["${xen::params::kernel_package}"]
     }
 
-    package { $xen::params::utils_packages :
-        ensure  => "${xen::dom0::ensure}",
+    package { 'utils-packages' :
+        ensure  => $xen::dom0::ensure ? { 'present' => 'latest', default => 'absent'},
+        name    => $xen::params::utils_packages,
         require => Package['xen']
     }
 
@@ -383,6 +384,25 @@ class xen::dom0::debian inherits xen::dom0::common {
             onlyif   => "grep 'brctl show | wc -l' ${xen::params::scriptsdir}/network-bridge",
             require  => File["${patchfile}"]
         }
+    }
+
+    # Debian Wheezy (use wheezy-backports for the xen-tools)
+    if ($::lsbdistid == 'Debian') and ( $::lsbdistcodename == 'wheezy' ) {
+        apt::source{"backports":
+            content => "deb http://http.debian.net/debian ${::lsbdistcodename}-backports main contrib non-free\n",
+        } ->
+        apt::preferences {"wheezy-backports-default":
+           ensure => present,
+           package => "*",
+           pin => "release n=wheezy-backports",
+           priority => 200,
+        } ->
+        apt::preferences {"wheezy-backports-xentools":
+           ensure => present,
+           package => "debootstrap xen-tools",
+           pin => "release n=wheezy-backports",
+           priority => 999,
+        } -> Package['utils-packages']
     }
 }
 

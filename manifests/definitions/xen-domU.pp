@@ -231,7 +231,7 @@ define xen::domU (
                 creates => "${domU_configfile}",
                 timeout => $timeout,
                 require => [
-                            Package['xen-tools'],
+                            Package['utils-packages'],
                             File["${xen::params::toolsdir}/xen-tools.conf"]
                             ]
             }

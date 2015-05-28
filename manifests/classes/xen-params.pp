@@ -170,7 +170,8 @@ class xen::params {
                      ],
         'wheezy'  => [
                      'xen-tools',
-                     'xen-utils-4.1'
+                     'xen-utils-4.1',
+                     'debootstrap'
                      ],
         default   => [
                      'xen-tools',
