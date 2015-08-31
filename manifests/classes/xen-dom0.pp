@@ -135,7 +135,7 @@ class xen::dom0::common {
         timeout   => 10,
     }
 
-    # disable the OS prober, so that you don’t get boot entries for each virtual
+    # disable the OS prober, so that you don't get boot entries for each virtual
     # machine you install on a volume group.
     augeas { "/etc/default/grub/GRUB_DISABLE_OS_PROBER":
         context => "/files//etc/default/grub",
