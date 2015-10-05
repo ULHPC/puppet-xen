@@ -71,7 +71,7 @@ define xen::domU (
     $mac        = '',
     $infofile   = '',
     $password   = '',
-    $timeout    = 360
+    $timeout    = 3600
 )
 {
     include xen::params
