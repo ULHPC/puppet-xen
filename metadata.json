@@ -42,5 +42,17 @@
       ]
     }
   ],
-  "tags": ["xen", "virtualization"]
+  "tags": [
+    "xen",
+    "virtualization"
+  ],
+  "classes": [
+    "xen",
+    "xen::common",
+    "xen::common::debian",
+    "xen::params"
+  ],
+  "definitions": [
+    "xen::domu"
+  ]
 }
