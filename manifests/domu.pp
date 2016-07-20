@@ -217,7 +217,7 @@ define xen::domu (
     }
 
     # The final command
-    $xen_create_image_cmd = "echo xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} ${opt_install_method} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}' ${opt_install_method}"
+    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} ${opt_install_method} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}' ${opt_install_method}"
 
 
     # stage one: ensure the domU exists
@@ -289,9 +289,9 @@ define xen::domu (
             info("deleting Xen domU ${domU_hostname}")
             exec { "xen_delete_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command => "echo xen-delete-image --lvm ${xen::domU_lvm} ${domU_hostname}",
+                command => "xen-delete-image --lvm ${xen::domU_lvm} ${domU_hostname}",
                 onlyif  => "test -e /dev/mapper/${xen::domU_lvm}-${domU_hostname}--disk",
-                unless  => "echo xm list | grep -e '^${domU_hostname} '",
+                unless  => "xm list | grep -e '^${domU_hostname} '",
                 timeout => $timeout,
                 require => [
                             Package['xen-tools'],
@@ -323,8 +323,8 @@ define xen::domu (
             # Now run the VM
             exec { "xen_run_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command => "echo xm create ${domU_hostname}.cfg",
-                unless  => "echo xm list | grep -e '^${domU_hostname} '",
+                command => "xm create ${domU_hostname}.cfg",
+                unless  => "xm list | grep -e '^${domU_hostname} '",
                 require => [
                             Exec["xen_create_${domU_hostname}"],
                             File[$xen::params::configfile],
@@ -351,8 +351,8 @@ define xen::domu (
             # Shutdown the VM (first gracefully)
             exec { "xen_shutdown_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command => "echo xm shutdown -w ${domU_hostname}",
-                onlyif  => "echo xm list | grep -e '^${domU_hostname} '",
+                command => "xm shutdown -w ${domU_hostname}",
+                onlyif  => "xm list | grep -e '^${domU_hostname} '",
                 timeout => 60,
                 notify  => Exec["xen_destroy_${domU_hostname}"],
                 require => Service['xen']
@@ -360,8 +360,8 @@ define xen::domu (
             # Shutdown the VM (more abruptly)
             exec { "xen_destroy_${domU_hostname}":
                 path        => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command     => "echo xm destroy ${domU_hostname}",
-                onlyif      => "echo xm list | grep -e '^${domU_hostname} '",
+                command     => "xm destroy ${domU_hostname}",
+                onlyif      => "xm list | grep -e '^${domU_hostname} '",
                 refreshonly => true,
                 require     => Service['xen']
             }
