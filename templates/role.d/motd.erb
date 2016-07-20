@@ -1,0 +1,145 @@
+#! /bin/bash
+################################################################################
+#
+# <%= scope.lookupvar('xen::params::roledir') %>/motd
+#
+# This role helps to customize guest's /etc/motd.tail
+#
+# Copyright (c) 2012 Sebastien Varrette <Sebastien.Varrette@uni.lu>
+#               http://varrette.gforge.uni.lu
+#
+################################################################################
+
+prefix=$1
+shift
+
+MOTD_TAIL="/etc/motd.tail"
+MOTD="/etc/motd"
+
+print_usage() {
+    cat <<EOF
+    $0 <prefix> [--motd_hostname "domU_hostname"] \
+                [--motd_mgs1 "message 1"] \
+                [--motd_mgs2 "message 2"] \
+                [--motd_netinfo "network info"] \
+                [--motd_vcpus XX] \
+                [--motd_ramsize "XXMb"] \
+                [--motd_swapsize "XXMb"] \
+                [--motd_rootsize "XXGb"]
+
+This will generate the appropriate ${MOTD_TAIL} file
+EOF
+}
+
+#
+#  Source our common functions - this will let us install a Debian package.
+#
+if [ -e /usr/lib/xen-tools/common.sh ]; then
+    . /usr/lib/xen-tools/common.sh
+elif [ -e /usr/share/xen-tools/common.sh ]; then
+    . /usr/share/xen-tools/common.sh
+else
+    echo "Installation problem"
+fi
+
+#
+# Log our start
+#
+logMessage Script $0 starting
+
+
+DOMO=<%= @fqdn %>
+DOMO_HOSTNAME=<%= @hostname %>
+DOMU_HOSTNAME=''
+DOMU_DOMAIN=`hostname -f | cut -d '.' -f 2`
+MSG1="Xen DomU"
+MSG2=""
+NETINFO=""
+
+# Parse the command-line options
+while [ $# -ge 1 ]; do
+    case $1 in
+        -h | --help)    print_usage;       exit 0;;
+        -V | --version) print_version;     exit 0;;
+        --motd_msg1)      shift; MSG1=$1;;
+        --motd_msg2)      shift; MSG2=$1;;
+        --motd_hostname)  shift; DOMU_HOSTNAME=$1;;
+        --motd_domain)    shift; DOMU_DOMAIN=$1;;
+        --motd_netinfo)   shift; NETINFO=$1;;
+        --motd_vcpus)     shift; VCPUs=$1;;
+        --motd_ramsize)   shift; RAMSIZE=$1;;
+        --motd_swapsize)  shift; SWAPSIZE=$1;;
+        --motd_rootsize)  shift; SIZE=$1;;
+    esac
+    shift
+done
+
+# cat <<EOF
+#  - DomU hostname= ${DOMU_HOSTNAME}
+#  - MSG1: ${MSG1}
+#  - MSG2: ${MSG2}
+#  - Netinfo: ${NETINFO}
+#  - VCPUs: ${VCPUs}
+#  - RAMSIZE: ${RAMSIZE}
+#  - SWAPSIZE: ${SWAPSIZE}
+#  - SIZE: ${SIZE}
+# EOF
+
+
+# Install a few packages
+installDebianPackage ${prefix} figlet
+installDebianPackage ${prefix} bash-completion
+installDebianPackage ${prefix} git-core          # For __git-ps1
+
+# Backup the old /etc/motd file
+if [ -f "${prefix}/${MOTDL}" ]; then
+    cp ${prefix}/${MOTD} ${prefix}/${MOTD}.old
+fi
+
+# Backup the old /etc/motd.tail file
+if [ -f "${prefix}/${MOTD_TAIL}" ]; then
+    cp ${prefix}/${MOTD_TAIL} ${prefix}/${MOTD_TAIL}.old
+fi
+
+# Now start the new motd file
+cat <<MOTD_TAIL_EOF > ${prefix}/${MOTD_TAIL}
+================================================================================
+ Welcome to ${DOMU_HOSTNAME}.${DOMU_DOMAIN}
+================================================================================
+MOTD_TAIL_EOF
+
+if [ -n "$MSG1" ]; then
+    figlet -w 80 -c "${MSG1}" >>  ${prefix}/${MOTD_TAIL}
+fi
+if [ -n "$MSG2" ]; then
+    figlet -w 80 -c "${MSG2}" >>  ${prefix}/${MOTD_TAIL}
+fi
+
+cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
+================================================================================
+    Hostname.... ${DOMU_HOSTNAME}
+    OS.......... <%= @lsbdistdescription %>
+    vCPUs....... ${VCPUs}
+    RAM size.... ${RAMSIZE}
+    Partitions.. swap (${SWAPSIZE})
+                 /    (ext4,${SIZE})
+MOTD_TAIL_EOF
+
+if [ -n "${NETINFO}" ]; then
+cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
+    ${NETINFO}
+MOTD_TAIL_EOF
+fi
+
+cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
+
+    /!\ Xen domU from ${DOMO_HOSTNAME}
+================================================================================
+MOTD_TAIL_EOF
+
+# cp ${prefix}/${MOTD_TAIL} ${prefix}/${MOTD}
+
+#
+#  Log our finish
+#
+    logMessage Script $0 finished
