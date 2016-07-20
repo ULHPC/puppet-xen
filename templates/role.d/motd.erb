@@ -48,8 +48,8 @@ fi
 logMessage Script $0 starting
 
 
-DOMO=<%= fqdn %>
-DOMO_HOSTNAME=<%= hostname %>
+DOMO=<%= @fqdn %>
+DOMO_HOSTNAME=<%= @hostname %>
 DOMU_HOSTNAME=''
 DOMU_DOMAIN=`hostname -f | cut -d '.' -f 2`
 MSG1="Xen DomU"
@@ -118,7 +118,7 @@ fi
 cat <<MOTD_TAIL_EOF >> ${prefix}/${MOTD_TAIL}
 ================================================================================
     Hostname.... ${DOMU_HOSTNAME}
-    OS.......... <%= lsbdistdescription %>
+    OS.......... <%= @lsbdistdescription %>
     vCPUs....... ${VCPUs}
     RAM size.... ${RAMSIZE}
     Partitions.. swap (${SWAPSIZE})

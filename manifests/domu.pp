@@ -48,7 +48,7 @@
 #
 # [Remember: No empty lines between comments and class definition]
 #
-define xen::domU (
+define xen::domu (
     $ensure     = $xen::params::ensure,
     $order      = $xen::params::domU_order,
     $use_pygrub = $xen::params::domU_use_pygrub,
@@ -100,9 +100,9 @@ define xen::domU (
         fail("Cannot create Xen domain with empty name")
     }
 
-    # Check the presence of the xen::dom0 class
-    if !defined(Class['xen::dom0']) {
-        fail("The Puppet class xen::dom0 is not instanciated")
+    # Check the presence of the xen class
+    if !defined(Class['xen']) {
+        fail("The Puppet class xen is not instanciated")
     }
 
     info ("Configuring xen::domU for ${domU_hostname} (with ensure = ${ensure})")
@@ -114,27 +114,27 @@ define xen::domU (
         fail("xen::domU 'ensure' parameter must be set to either 'present', 'absent', 'running', 'stopped'")
     }
 
-    if ($xen::dom0::ensure != $ensure) {
-        if ($xen::dom0::ensure != 'present') {
-            fail("Cannot configure a xen DomU '${domU_hostname}' as xen::dom0::ensure is NOT set to present (but ${xen::dom0::ensure})")
+    if ($xen::ensure != $ensure) {
+        if ($xen::ensure != 'present') {
+            fail("Cannot configure a xen DomU '${domU_hostname}' as xen::ensure is NOT set to present (but ${xen::ensure})")
         }
     }
 
     # Collect the domU specific values
     $domU_gateway = $gateway ? {
-        ''      => "${xen::dom0::domU_gateway}",
+        ''      => "${xen::domU_gateway}",
         default => "${gateway}"
     }
     $domU_netmask = $netmask ? {
-        ''      => "${xen::dom0::domU_netmask}",
+        ''      => "${xen::domU_netmask}",
         default => "${netmask}"
     }
     $domU_broadcast = $broadcast ? {
-        ''      => "${xen::dom0::domU_broadcast}",
+        ''      => "${xen::domU_broadcast}",
         default => "${broadcast}"
     }
     $domU_arch = $arch ? {
-        ''      => "${xen::dom0::domU_arch}",
+        ''      => "${xen::domU_arch}",
         default => "${arch}"
     }
 
@@ -156,7 +156,7 @@ define xen::domU (
         true    => '--force',
         default => ''
     }
-    $real_roles = array_add($roles, 'motd')
+    $real_roles = concat($roles, 'motd')
 
     $motd_netinfo = $ip ? {
         '' => $use_dhcp ? {
@@ -170,7 +170,7 @@ define xen::domU (
 
     $opt_role = $real_roles ? {
         ''      => '',
-        default => inline_template("--role=<%= real_roles.join(',') %> ${motd_role_args}")
+        default => inline_template("--role=<%= @real_roles.join(',') %> ${motd_role_args}")
     }
 
     $opt_dist = $distrib ? {
@@ -217,7 +217,7 @@ define xen::domU (
     }
 
     # The final command
-    $xen_create_image_cmd = "xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} ${opt_install_method} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}' $opt_install_method"
+    $xen_create_image_cmd = "echo xen-create-image ${opt_force} ${opt_scsi} ${opt_pygrub} --arch ${domU_arch} --vcpus ${vcpus} --host ${domU_hostname} ${opt_dist} ${opt_install_method} --size=${size} ${opt_swap} --memory=${ramsize} ${opt_role} ${opt_network_config} --genpass=0 --password='${root_passwd}' $opt_install_method"
 
 
     # stage one: ensure the domU exists
@@ -227,11 +227,11 @@ define xen::domU (
             exec { "xen_create_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
                 command => "${xen_create_image_cmd}",
-                #creates => "/dev/mapper/${xen::dom0::domU_lvm}-${domU_hostname}--disk",
+                #creates => "/dev/mapper/${xen::domU_lvm}-${domU_hostname}--disk",
                 creates => "${domU_configfile}",
                 timeout => $timeout,
                 require => [
-                            Package['utils-packages'],
+                            File["${xen::params::configdir}"],
                             File["${xen::params::toolsdir}/xen-tools.conf"]
                             ]
             }
@@ -259,7 +259,7 @@ define xen::domU (
             # }
 
             exec { "Adapting ${domU_snapshot_configfile}":
-                command => "sed 's/${xen::dom0::domU_lvm}\\/${domU_hostname}-disk/${xen::dom0::domU_lvm}\\/${domU_hostname}-snapshot-disk/' ${domU_configfile} >  ${domU_snapshot_configfile}",
+                command => "sed 's/${xen::domU_lvm}\\/${domU_hostname}-disk/${xen::domU_lvm}\\/${domU_hostname}-snapshot-disk/' ${domU_configfile} >  ${domU_snapshot_configfile}",
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
                 user    => "${xen::params::configfile_owner}",
                 group   => "${xen::params::configfile_group}",
@@ -289,9 +289,9 @@ define xen::domU (
             info("deleting Xen domU ${domU_hostname}")
             exec { "xen_delete_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
-                command => "xen-delete-image --lvm ${xen::dom0::domU_lvm} ${domU_hostname}",
-                onlyif  => "test -e /dev/mapper/${xen::dom0::domU_lvm}-${domU_hostname}--disk",
-                unless  => "xm list | grep -e '^${domU_hostname} '",
+                command => "echo xen-delete-image --lvm ${xen::domU_lvm} ${domU_hostname}",
+                onlyif  => "test -e /dev/mapper/${xen::domU_lvm}-${domU_hostname}--disk",
+                unless  => "echo xm list | grep -e '^${domU_hostname} '",
                 timeout => $timeout,
                 require => [
                             Package['xen-tools'],
@@ -323,8 +323,8 @@ define xen::domU (
             # Now run the VM
             exec { "xen_run_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
-                command => "xm create ${domU_hostname}.cfg",
-                unless  => "xm list | grep -e '^${domU_hostname} '",
+                command => "echo xm create ${domU_hostname}.cfg",
+                unless  => "echo xm list | grep -e '^${domU_hostname} '",
                 require => [
                             Exec["xen_create_${domU_hostname}"],
                             File["${xen::params::configfile}"],
@@ -351,8 +351,8 @@ define xen::domU (
             # Shutdown the VM (first gracefully)
             exec { "xen_shutdown_${domU_hostname}":
                 path    => "/usr/bin:/usr/sbin:/bin:/sbin",
-                command => "xm shutdown -w ${domU_hostname}",
-                onlyif  => "xm list | grep -e '^${domU_hostname} '",
+                command => "echo xm shutdown -w ${domU_hostname}",
+                onlyif  => "echo xm list | grep -e '^${domU_hostname} '",
                 timeout => 60,
                 notify  => Exec["xen_destroy_${domU_hostname}"],
                 require => Service['xen']
@@ -360,8 +360,8 @@ define xen::domU (
             # Shutdown the VM (more abruptly)
             exec { "xen_destroy_${domU_hostname}":
                 path        => "/usr/bin:/usr/sbin:/bin:/sbin",
-                command     => "xm destroy ${domU_hostname}",
-                onlyif      => "xm list | grep -e '^${domU_hostname} '",
+                command     => "echo xm destroy ${domU_hostname}",
+                onlyif      => "echo xm list | grep -e '^${domU_hostname} '",
                 refreshonly => true,
                 require     => Service['xen']
             }

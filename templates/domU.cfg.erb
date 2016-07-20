@@ -21,8 +21,8 @@ memory      = '<%= memory %>'
 #
 root        = '/dev/xvda2 ro'
 disk        = [
-                  'phy:/dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-disk,xvda2,w',
-                  'phy:/dev/mapper/<%= scope.lookupvar('xen::dom0::domU_lvm') %>-<%= domU_hostname %>-swap,xvda1,w',
+                  'phy:/dev/mapper/<%= scope.lookupvar('xen::domU_lvm') %>-<%= domU_hostname %>-disk,xvda2,w',
+                  'phy:/dev/mapper/<%= scope.lookupvar('xen::domU_lvm') %>-<%= domU_hostname %>-swap,xvda1,w',
               ]
 
 

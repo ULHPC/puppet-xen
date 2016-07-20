@@ -54,7 +54,7 @@
 ##
 # lvm = vg0
 
-lvm = <%= domU_lvm %>
+lvm = <%= @domU_lvm %>
 
 #
 ##
@@ -126,9 +126,9 @@ install-method = debootstrap
 #  Disk and Sizing options.
 ##
 #
-size   = <%= domU_size   %>    # Disk image size.
-memory = <%= domU_memory %>   # Memory size
-swap   = <%= domU_swap   %>   # Swap size
+size   = <%= @domU_size   %>    # Disk image size.
+memory = <%= @domU_memory %>   # Memory size
+swap   = <%= @domU_swap   %>   # Swap size
 # noswap = 1      # Don't use swap at all for the new system.
 fs     = ext4     # use the EXT4 filesystem for the disk image.
 dist   = `xt-guess-suite-and-mirror --suite` # Default distribution to install.
@@ -150,9 +150,9 @@ image  = sparse   # Specify sparse vs. full disk images.
 # Uncomment and adjust these network settings if you wish to give your
 # new instances static IP addresses.
 #
-gateway    = <%= domU_gateway %>
-netmask    = <%= domU_netmask %>
-broadcast  = <%= domU_broadcast %>
+gateway    = <%= @domU_gateway %>
+netmask    = <%= @domU_netmask %>
+broadcast  = <%= @domU_broadcast %>
 #
 # Uncomment this if you wish the images to use DHCP
 #
@@ -173,7 +173,7 @@ broadcast  = <%= domU_broadcast %>
 # for guests.
 #
 # bridge = xendmz
-bridge = br<%= bridge_on[0] %>
+bridge = br<%= @bridge_on[0] %>
 #
 
 ##
@@ -250,7 +250,7 @@ pygrub = 1
 #
 # arch = [i386|amd64]
 #
-arch = <%= domU_arch %>
+arch = <%= @domU_arch %>
 
 #
 # The default mirror for debootstrap to install Debian-derived distributions
