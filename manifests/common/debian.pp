@@ -79,14 +79,14 @@ class xen::common::debian inherits xen::common {
         apt::source{'backports':
             location => 'http://http.debian.net/debian',
             release  => "${::lsbdistcodename}-backports",
-            repos    => 'main contrib non-free'
-            priority => '200'
+            repos    => 'main contrib non-free',
+            pin      => '200'
         } ->
         apt::pin {'wheezy-backports-xentools':
           ensure   => present,
           packages => 'debootstrap xen-tools',
           priority => 999,
-          release  => 'wheezy-backports'
+          release  => 'wheezy-backports',
         } -> Package['xen']
     }
 }
