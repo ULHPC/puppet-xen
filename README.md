@@ -21,8 +21,13 @@ Configure and manage Xen.
 This module implements the following elements: 
 
 * __Puppet classes__:
+    - `xen` 
+    - `xen::common` 
+    - `xen::common::debian` 
+    - `xen::params` 
 
 * __Puppet definitions__: 
+    - `xen::domu` 
 
 All these components are configured through a set of variables you will find in
 [`manifests/params.pp`](manifests/params.pp). 
@@ -35,6 +40,10 @@ See `docs/contributing.md` for more details on the steps you shall follow to hav
 See [`metadata.json`](metadata.json). In particular, this module depends on 
 
 * [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
+* [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
+* [ULHPC/kernel](https://forge.puppetlabs.com/ULHPC/kernel)
+* [ULHPC/sysctl](https://forge.puppetlabs.com/ULHPC/sysctl)
+* [ULHPC/network](https://forge.puppetlabs.com/ULHPC/network)
 
 ## Overview and Usage
 
@@ -51,6 +60,23 @@ Use it as follows:
 
 See also [`tests/init.pp`](tests/init.pp)
 
+
+### Definition `xen::domu`
+
+The definition `xen::domu` provides ...
+This definition accepts the following parameters:
+
+* `$ensure`: default to 'present', can be 'absent'
+* `$content`: specify the contents of the directive as a string
+* `$source`: copy a file as the content of the directive.
+
+Example:
+
+        xen::domu { 'toto':
+		      ensure => 'present',
+        }
+
+See also [`tests/domu.pp`](tests/domu.pp)
 
 
 ## Librarian-Puppet / R10K Setup
