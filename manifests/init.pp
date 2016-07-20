@@ -76,7 +76,7 @@ inherits xen::params
     case $::operatingsystem {
         debian, ubuntu:         { include xen::common }
         default: {
-            fail("Module $module_name is not supported on $operatingsystem")
+            fail("Module ${module_name} is not supported on ${::operatingsystem}")
         }
     }
 }

@@ -30,156 +30,156 @@ class xen::params {
     ###########################################
 
     # ensure the presence (or absence) of xen
-    $ensure = $xen_ensure ? {
+    $ensure = $::xen_ensure ? {
         ''      => 'present',
-        default => "${xen_ensure}"
+        default => $::xen_ensure
     }
 
     # List the interfaces on which a network bridge should be configured
-    $bridge_on = $xen_bridge_on ? {
+    $bridge_on = $::xen_bridge_on ? {
         ''      => [ 'eth1' ],
-        default => $xen_bridge_on
+        default => $::xen_bridge_on
     }
 
     # List the interfaces, used at the same time as a bridge and for the dom0
-    $if_shared = $xen_if_shared ? {
+    $if_shared = $::xen_if_shared ? {
         ''      => '',
-        default => $xen_if_shared
+        default => $::xen_if_shared
     }
 
     # Memory for the dom0 (MB)
-    $dom0_mem = $xen_dom0_mem ? {
+    $dom0_mem = $::xen_dom0_mem ? {
         ''      => '',
-        default => $xen_dom0_mem
+        default => $::xen_dom0_mem
     }
 
     # Use the pygrub wrapper such that each VM manages its own kernel and does not
     # use the one of the Xen dom0
-    $domU_use_pygrub = $xen_domU_use_pygrub ? {
+    $domU_use_pygrub = $::xen_domU_use_pygrub ? {
         ''      => true,
         'yes'   => true,
         'no'    => false,
-        default => $xen_domU_use_pygrub
+        default => $::xen_domU_use_pygrub
     }
 
     # Use SCSI names for virtual devices (i.e. sda not xvda). for creating
     # squeeze hosts, you will probably have to drop this option (as discussed
     # [here](http://superuser.com/questions/255083/xen-fails-to-boot-timeout-mounting-dev-sda2)
     # or you won't be able to boot
-    $domU_use_scsi = $xen_domU_use_scsi ? {
+    $domU_use_scsi = $::xen_domU_use_scsi ? {
         ''      => false,
         'yes'   => true,
         'no'    => false,
-        default => $xen_domU_use_scsi
+        default => $::xen_domU_use_scsi
     }
 
     # true if you wish the images to use DHCP
-    $domU_use_dhcp = $xen_domU_use_dhcp ? {
+    $domU_use_dhcp = $::xen_domU_use_dhcp ? {
         ''      => true,
         'yes'   => true,
         'no'    => false,
-        default => $xen_domU_use_dhcp
+        default => $::xen_domU_use_dhcp
     }
 
     # Order of the domU when placed in the /etc/xen/auto directory
-    $domU_order = $xen_domU_order ? {
+    $domU_order = $::xen_domU_order ? {
         ''      => 50,
-        default => $xen_domU_order
+        default => $::xen_domU_order
     }
 
     # Number of virtual CPUs (i.e. cores) assigned to the domU
-    $domU_vcpus = $xen_domU_vcpus ? {
+    $domU_vcpus = $::xen_domU_vcpus ? {
         ''      => 1,
-        default => $xen_domU_vcpus
+        default => $::xen_domU_vcpus
     }
 
     # Default distribution to install. (Guess automatically by calling
     # `xt-guess-suite-and-mirror --suite`by default)
-    $domU_distrib = $xen_domU_distrib ? {
+    $domU_distrib = $::xen_domU_distrib ? {
         ''      => '',
-        default => $xen_domU_distrib
+        default => $::xen_domU_distrib
     }
 
 
     # LVM volume group to use for hosting domU disk image
-    $domU_lvm = $xen_domU_lvm ? {
-        ''      => "vg_${hostname}_domU",
-        default => "$xen_domU_lvm"
+    $domU_lvm = $::xen_domU_lvm ? {
+        ''      => "vg_${::hostname}_domU",
+        default => $::xen_domU_lvm
     }
 
     # domU Disk image size.
-    $domU_size = $xen_domU_size ? {
+    $domU_size = $::xen_domU_size ? {
         ''      => '10Gb',
-        default => "$xen_domU_size"
+        default => $::xen_domU_size
     }
     # domU Memory size
-    $domU_memory = $xen_domU_memory ? {
+    $domU_memory = $::xen_domU_memory ? {
         ''      => '256Mb',
-        default => "$xen_domU_memory"
+        default => $::xen_domU_memory
     }
     # domU Swap size
-    $domU_swap = $xen_domU_swap ? {
+    $domU_swap = $::xen_domU_swap ? {
         ''      => '512Mb',
-        default => "$xen_domU_swap"
+        default => $::xen_domU_swap
     }
     # domU network settings
-    $domU_gateway = $xen_domU_gateway ? {
+    $domU_gateway = $::xen_domU_gateway ? {
         ''      => '10.74.0.1',
-        default => "$xen_domU_gateway"
+        default => $::xen_domU_gateway
     }
-    $domU_netmask = $xen_domU_netmask ? {
+    $domU_netmask = $::xen_domU_netmask ? {
         ''      => '255.255.0.0',
-        default => "$xen_domU_netmask"
+        default => $::xen_domU_netmask
     }
-    $domU_broadcast = $xen_domU_broadcast ? {
+    $domU_broadcast = $::xen_domU_broadcast ? {
         ''      => '10.74.255.255',
-        default => "$xen_domU_broadcast"
+        default => $::xen_domU_broadcast
     }
     # domU architecture to use when using debootstrap
-    $domU_arch = $xen_domU_arch ? {
+    $domU_arch = $::xen_domU_arch ? {
         ''      => 'amd64',
-        default => "$xen_domU_arch"
+        default => $::xen_domU_arch
     }
 
     # List of the specified role script(s) post-install.
-    $domU_roles = $xen_domU_roles ? {
+    $domU_roles = $::xen_domU_roles ? {
         ''      => [ 'udev' ],
-        default => $xen_domU_roles
+        default => $::xen_domU_roles
     }
 
 
     #### MODULE INTERNAL VARIABLES  #########
     # (Modify to adapt to unsupported OSes)
     #######################################
-    $packagename = $lsbdistcodename ? {
+    $packagename = $::lsbdistcodename ? {
         'squeeze' => 'xen-hypervisor-4.0-amd64',
         'wheezy'  => 'xen-hypervisor-4.1-amd64',
         default   => 'xen-hypervisor-4.1-amd64'
     }
 
-    $kernel_package = $lsbdistcodename ? {
+    $kernel_package = $::lsbdistcodename ? {
         'squeeze' => 'linux-image-2.6-xen-amd64',
         'wheezy'  => 'linux-image-3.2.0-4-amd64',
         default   => 'linux-image-3.2.0-4-amd64'
     }
 
-    $utils_packages = $lsbdistcodename ? {
+    $utils_packages = $::lsbdistcodename ? {
         'squeeze' => [
-                     'xen-tools',
-                     'xen-utils-4.0'
-                     ],
+                      'xen-tools',
+                      'xen-utils-4.0'
+                      ],
         'wheezy'  => [
-                     'xen-tools',
-                     'xen-utils-4.1',
-                     'debootstrap'
-                     ],
+                      'xen-tools',
+                      'xen-utils-4.1',
+                      'debootstrap'
+                      ],
         default   => [
-                     'xen-tools',
-                     'xen-utils-4.1'
-                     ]
+                      'xen-tools',
+                      'xen-utils-4.1'
+                      ]
     }
 
-    $servicename = $lsbdistcodename ? {
+    $servicename = $::lsbdistcodename ? {
         'squeeze' => 'xend',
         'wheezy'  => 'xen',
         default   => 'xend'
@@ -202,7 +202,7 @@ class xen::params {
 
     # Configuration directory for Xen
     $configdir = $::operatingsystem ? {
-        default => "/etc/xen",
+        default => '/etc/xen',
     }
     $configdir_mode = $::operatingsystem ? {
         default => '0755',
@@ -235,7 +235,7 @@ class xen::params {
 
     # Xen script dir (in particular for network bridge configuration)
     $scriptsdir = $::operatingsystem ? {
-        default => "/etc/xen/scripts",
+        default => '/etc/xen/scripts',
     }
 
     # Xen directory holding the domUs to start on boot
@@ -246,10 +246,10 @@ class xen::params {
 
     # Directory containing xen-tools
     $toolsdir = $::operatingsystem ? {
-        default => "/etc/xen-tools",
+        default => '/etc/xen-tools',
     }
     $tools_logdir  = $::operatingsystem ? {
-        default => "/var/log/xen-tools",
+        default => '/var/log/xen-tools',
     }
     $grubconfdir = $::operatingsystem ? {
         default => '/etc/grub.d'

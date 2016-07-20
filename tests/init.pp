@@ -28,13 +28,13 @@ node default {
     }
 
     xen::domU { 'test-vm':
-        ensure     => 'running',
-        order      => 25,
-        desc       => 'Test VM',
-        vcpus      => 1,
-        size       => '1Gb',
-        ramsize    => '256Mb',
-        swap       => '128Mb',
-        ip         => '10.20.30.42',
+        ensure  => 'running',
+        order   => 25,
+        desc    => 'Test VM',
+        vcpus   => 1,
+        size    => '1Gb',
+        ramsize => '256Mb',
+        swap    => '128Mb',
+        ip      => '10.20.30.42',
     }
 }
