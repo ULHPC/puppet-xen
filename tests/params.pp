@@ -15,7 +15,7 @@
 
 include 'xen::params'
 
-$names = ["ensure", "bridge_on", "if_shared", "dom0_mem", "domU_use_pygrub", "domU_use_scsi", "domU_use_dhcp", "domU_order", "domU_vcpus", "domU_distrib", "domU_lvm", "domU_size", "domU_memory", "domU_swap", "domU_gateway", "domU_netmask", "domU_broadcast", "domU_arch", "domU_roles", "packagename", "kernel_package", "utils_packages", "servicename", "processname", "hasstatus", "hasrestart", "configdir", "configdir_mode", "configdir_owner", "configdir_group", "configfile", "configfile_mode", "configfile_owner", "configfile_group", "scriptsdir", "autodir", "toolsdir", "tools_logdir", "grubconfdir", "updategrub", "skeldir", "roledir"]
+$names = ['ensure', 'bridge_on', 'if_shared', 'dom0_mem', 'domU_use_pygrub', 'domU_use_scsi', 'domU_use_dhcp', 'domU_order', 'domU_vcpus', 'domU_distrib', 'domU_lvm', 'domU_size', 'domU_memory', 'domU_swap', 'domU_gateway', 'domU_netmask', 'domU_broadcast', 'domU_arch', 'domU_roles', 'packagename', 'kernel_package', 'utils_packages', 'servicename', 'processname', 'hasstatus', 'hasrestart', 'configdir', 'configdir_mode', 'configdir_owner', 'configdir_group', 'configfile', 'configfile_mode', 'configfile_owner', 'configfile_group', 'scriptsdir', 'autodir', 'toolsdir', 'tools_logdir', 'grubconfdir', 'updategrub', 'skeldir', 'roledir']
 
 notice("xen::params::ensure = ${xen::params::ensure}")
 notice("xen::params::bridge_on = ${xen::params::bridge_on}")
