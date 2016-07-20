@@ -1,0 +1,30 @@
+{
+  "name": "ULHPC/xen",
+  "version": "0.0.1",
+  "author": "S. Varrette, H. Cartiaux, V. Plugaru, S. Diehl aka. UL HPC Management Team",
+  "mail": "hpc-sysadmins@uni.lu",
+  "summary": "Configure and manage Xen",
+  "description": "Configure and manage Xen",
+  "license": "GPL-3.0",
+  "source": "https://github.com/ULHPC/puppet-xen",
+  "docs_project": "ulhpc-puppet-xen",
+  "project_page": "https://github.com/ULHPC/puppet-xen",
+  "issues_url": "https://github.com/ULHPC/puppet-xen/issues",
+  "forge_url": "https://forge.puppetlabs.com/ULHPC/xen",
+  "dependencies": [
+    {
+      "name": "puppetlabs-stdlib",
+      "version_requirement": ">=4.2.2 <5.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    }
+  ],
+  "tags": ["xen", "virtualization"]
+}
