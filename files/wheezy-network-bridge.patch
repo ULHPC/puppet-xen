@@ -1,0 +1,13 @@
+--- /etc/xen/scripts/network-bridge.old  2013-03-01 01:52:34.708974732 +0100
++++ /etc/xen/scripts/network-bridge      2013-03-01 01:38:22.744549288 +0100
+@@ -217,10 +217,6 @@
+        return
+     fi
+
+-    if [ `brctl show | wc -l` != 1 ]; then
+-        return
+-    fi
+-
+     if link_exists "$pdev"; then
+         # The device is already up.
+         return
