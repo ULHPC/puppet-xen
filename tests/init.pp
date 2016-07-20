@@ -16,5 +16,25 @@
 #      sudo puppet apply -t /vagrant/tests/init.pp
 #
 node default {
-    include xen
+
+    class { 'xen':
+        bridge_on      => [ 'eth1' ],
+        domU_lvm       => 'vg_domU',
+        dom0_mem       => '4096',
+        domU_gateway   => '10.20.30.1',
+        domU_netmask   => '255.255.255.0',
+        domU_broadcast => '10.20.30.255',
+        domU_arch      => 'amd64'
+    }
+
+    xen::domU { 'test-vm':
+        ensure     => 'running',
+        order      => 25,
+        desc       => 'Test VM',
+        vcpus      => 1,
+        size       => '1Gb',
+        ramsize    => '256Mb',
+        swap       => '128Mb',
+        ip         => '10.20.30.42',
+    }
 }
