@@ -173,6 +173,11 @@ class xen::params {
                       'xen-utils-4.1',
                       'debootstrap'
                       ],
+        'jessie'  => [
+                      'xen-tools',
+                      'xen-utils-4.4',
+                      'debootstrap'
+                      ],
         default   => [
                       'xen-tools',
                       'xen-utils-4.1'
@@ -182,7 +187,16 @@ class xen::params {
     $servicename = $::lsbdistcodename ? {
         'squeeze' => 'xend',
         'wheezy'  => 'xen',
+        'jessie'  => 'xen',
         default   => 'xend'
+    }
+
+
+    $toolstack = $lsbdistcodename ? {
+        'squeeze' => 'xm',
+        'wheezy'  => 'xm',
+        'jessie'  => 'xl',
+        default   => 'xm'
     }
 
     # used for pattern in a service ressource

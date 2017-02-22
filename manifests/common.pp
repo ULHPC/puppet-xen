@@ -110,26 +110,6 @@ class xen::common {
         require => Package['xen']
     }
 
-    # Configure the network bridge file
-    file { "${xen::params::scriptsdir}/${::hostname}-network-bridge":
-        ensure  => 'file',
-        owner   => $xen::params::configdir_owner,
-        group   => $xen::params::configdir_group,
-        mode    => '0755',
-        content => template('xen/network-bridge.erb'),
-        require => File[$xen::params::scriptsdir]
-    }
-
-    $if_bridge = delete($xen::bridge_on, $xen::if_shared)
-
-    # Configure the interface in manual mode
-    network::interface { $if_bridge :
-        comment => "Activate the interface yet without any specific IP/configuration \n# Required for Xen bridge configuration",
-        auto    => false,
-        manual  => true,
-        dhcp    => false,
-    }
-
     # TODO: Edit /etc/xen/xend-config.sxp to enable the network bridge.
     # Replace:
     #     # (network-script network-bridge)
@@ -224,7 +204,6 @@ class xen::common {
                       Package['xen'],
                       File[$xen::params::configdir],
                       Augeas['/etc/default/xendomains/XENDOMAINS_RESTORE'],
-                      File["${xen::params::scriptsdir}/${::hostname}-network-bridge"]
                       ],
         subscribe  => File[$xen::params::configfile],
     }
