@@ -249,15 +249,6 @@ define xen::domu (
                             ]
             }
 
-            # Prepare the snapshot config file
-            # exec { "cp ${domU_configfile} ${domU_snapshot_configfile}":
-            #     path    => "/usr/bin:/usr/sbin:/bin:/sbin",
-            #     creates => "${domU_snapshot_configfile}",
-            #     user    => "${xen::params::configfile_owner}",
-            #     group   => "${xen::params::configfile_group}",
-            #     require => File["${domU_configfile}"]
-            # }
-
             exec { "Adapting ${domU_snapshot_configfile}":
                 command => "sed 's/${xen::domU_lvm}\\/${domU_hostname}-disk/${xen::domU_lvm}\\/${domU_hostname}-snapshot-disk/' ${domU_configfile} >  ${domU_snapshot_configfile}",
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
@@ -265,15 +256,6 @@ define xen::domu (
                 group   => $xen::params::configfile_group,
                 require => File[$domU_configfile]
             }
-
-            # replace the LVM disk in ${domU_snapshot_configfile}
-            # file { "${domU_snapshot_configfile}":
-            #     ensure  => 'file',
-            #     owner   => "${xen::params::configfile_owner}",
-            #     group   => "${xen::params::configfile_group}",
-            #     mode    => '0644',
-            #     require => File["${domU_configfile}"]
-            # }
 
             file { $domU_infofile:
                 ensure  => 'file',
@@ -291,7 +273,7 @@ define xen::domu (
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
                 command => "xen-delete-image --lvm ${xen::domU_lvm} ${domU_hostname}",
                 onlyif  => "test -e /dev/mapper/${xen::domU_lvm}-${domU_hostname}--disk",
-                unless  => "xm list | grep -e '^${domU_hostname} '",
+                unless  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 timeout => $timeout,
                 require => [
                             Package['xen-tools'],
@@ -323,8 +305,8 @@ define xen::domu (
             # Now run the VM
             exec { "xen_run_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command => "xm create ${domU_hostname}.cfg",
-                unless  => "xm list | grep -e '^${domU_hostname} '",
+                command => "${xen::params::toolstack} create ${domU_hostname}.cfg",
+                unless  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 require => [
                             Exec["xen_create_${domU_hostname}"],
                             File[$xen::params::configfile],
@@ -332,7 +314,7 @@ define xen::domu (
                             ]
             }
 
-            # Only create this after a successful xm create. This way if the
+            # Only create this after a successful ${xen::params::toolstack} create. This way if the
             # creation makes the machine crash, it won't be starting
             # automatically and crashing the machine in a loop.
             file { "${xen::params::autodir}/${order}-${domU_hostname}":
@@ -351,8 +333,8 @@ define xen::domu (
             # Shutdown the VM (first gracefully)
             exec { "xen_shutdown_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command => "xm shutdown -w ${domU_hostname}",
-                onlyif  => "xm list | grep -e '^${domU_hostname} '",
+                command => "${xen::params::toolstack} shutdown -w ${domU_hostname}",
+                onlyif  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 timeout => 60,
                 notify  => Exec["xen_destroy_${domU_hostname}"],
                 require => Service['xen']
@@ -360,8 +342,8 @@ define xen::domu (
             # Shutdown the VM (more abruptly)
             exec { "xen_destroy_${domU_hostname}":
                 path        => '/usr/bin:/usr/sbin:/bin:/sbin',
-                command     => "xm destroy ${domU_hostname}",
-                onlyif      => "xm list | grep -e '^${domU_hostname} '",
+                command     => "${xen::params::toolstack} destroy ${domU_hostname}",
+                onlyif      => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 refreshonly => true,
                 require     => Service['xen']
             }

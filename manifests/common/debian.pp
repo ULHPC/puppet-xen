@@ -89,4 +89,28 @@ class xen::common::debian inherits xen::common {
           release  => 'wheezy-backports',
         } -> Package['xen']
     }
+
+
+    if $::lsbdistcodename in ['squeeze', 'wheezy']
+    {
+        # Configure the network bridge file
+        file { "${xen::params::scriptsdir}/${::hostname}-network-bridge":
+            ensure  => 'file',
+            owner   => $xen::params::configdir_owner,
+            group   => $xen::params::configdir_group,
+            mode    => '0755',
+            content => template('xen/network-bridge.erb'),
+            require => File[$xen::params::scriptsdir]
+        }
+
+        $if_bridge = delete($xen::bridge_on, $xen::if_shared)
+
+        # Configure the interface in manual mode
+        network::interface { $if_bridge :
+            comment => "Activate the interface yet without any specific IP/configuration \n# Required for Xen bridge configuration",
+            auto    => false,
+            manual  => true,
+            dhcp    => false,
+        }
+    }
 }

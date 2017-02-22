@@ -152,7 +152,7 @@
 #
 # use
 #
-(network-script <%= @hostname %>-network-bridge)
+<% if @lsbdistcodename != 'squeeze' && @lsbdistcodename != 'wheezy' %>#<% end %>(network-script <%= @hostname %>-network-bridge)
 #
 # Your default ethernet device is used as the outgoing interface, by default.
 # To use a different one (e.g. eth1) use

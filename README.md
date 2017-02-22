@@ -9,7 +9,7 @@
 
 Configure and manage Xen
 
-      Copyright (c) 2016 S. Varrette, H. Cartiaux, V. Plugaru, S. Diehl aka. UL HPC Management Team <hpc-sysadmins@uni.lu>
+      Copyright (c) 2017 S. Varrette, H. Cartiaux, V. Plugaru, S. Diehl aka. UL HPC Management Team <hpc-sysadmins@uni.lu>
       
 
 | [Project Page](https://github.com/ULHPC/puppet-xen) | [Sources](https://github.com/ULHPC/puppet-xen) | [Documentation](https://ulhpc-puppet-xen.readthedocs.org/en/latest/) | [Issues](https://github.com/ULHPC/puppet-xen/issues) |
