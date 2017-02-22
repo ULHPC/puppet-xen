@@ -54,6 +54,7 @@
     "xen::params"
   ],
   "definitions": [
-    "xen::domu"
+    "xen::domu",
+    "xen::network::bridge"
   ]
 }
