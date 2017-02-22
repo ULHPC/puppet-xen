@@ -39,8 +39,8 @@ node default {
 #    }
 
     xen::network::bridge { 'eth2':
-        ensure    => 'present',
-        comment   => 'Access network (10.74.0.0/16) - VLAN 124'
+        ensure  => 'present',
+        comment => 'Access network (10.74.0.0/16) - VLAN 124'
     }
 
 }
