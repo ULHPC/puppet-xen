@@ -74,7 +74,7 @@ define xen::domu (
     $timeout    = 3600
 )
 {
-    include xen::params
+    include ::xen::params
 
     # $name is provided at define invocation
     $domU_hostname = $name
@@ -233,7 +233,7 @@ define xen::domu (
                 require => [
                             File[$xen::params::configdir],
                             File["${xen::params::toolsdir}/xen-tools.conf"]
-                            ]
+                            ],
             }
             # this should have created /etc/xen/${domU_hostname}.cfg
             file { $domU_configfile:
@@ -246,7 +246,7 @@ define xen::domu (
                             Package[$xen::params::kernel_package],
                             File[$xen::params::configdir],
                             Exec["xen_create_${domU_hostname}"]
-                            ]
+                            ],
             }
 
             exec { "Adapting ${domU_snapshot_configfile}":
@@ -254,19 +254,19 @@ define xen::domu (
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
                 user    => $xen::params::configfile_owner,
                 group   => $xen::params::configfile_group,
-                require => File[$domU_configfile]
+                require => File[$domU_configfile],
             }
 
             file { $domU_infofile:
                 ensure  => 'file',
                 replace => false,
                 content => template('xen/info_domU.txt.erb'),
-                require => Exec["xen_create_${domU_hostname}"]
+                require => Exec["xen_create_${domU_hostname}"],
             }
 
         }
 
-        absent: {
+        'absent': {
 
             info("deleting Xen domU ${domU_hostname}")
             exec { "xen_delete_${domU_hostname}":
@@ -279,12 +279,12 @@ define xen::domu (
                             Package['xen-tools'],
                             File["${xen::params::toolsdir}/xen-tools.conf"],
                             Exec["xen_shutdown_${domU_hostname}"]
-                            ]
+                            ],
             }
 
             file { [ $domU_configfile, $domU_snapshot_configfile, $domU_infofile ]:
                 ensure  => $ensure,
-                require => Exec["xen_delete_${domU_hostname}"]
+                require => Exec["xen_delete_${domU_hostname}"],
             }
 
         }
@@ -300,19 +300,19 @@ define xen::domu (
     # Stage two: deal with running/stopped VMs:
     case $ensure {
 
-        running: {
+        'running': {
 
             # Now run the VM
             exec { "xen_run_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
                 command => "${xen::params::toolstack} create ${domU_hostname}.cfg",
-                cwd     => "${xen::params::configdir}",
+                cwd     => $xen::params::configdir,
                 unless  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 require => [
                             Exec["xen_create_${domU_hostname}"],
                             File[$xen::params::configfile],
                             Service['xen']
-                            ]
+                            ],
             }
 
             # Only create this after a successful ${xen::params::toolstack} create. This way if the
@@ -325,7 +325,7 @@ define xen::domu (
                             File[$xen::params::autodir],
                             File[$domU_configfile],
                             Exec["xen_run_${domU_hostname}"]
-                            ]
+                            ],
             }
         }
 
@@ -338,7 +338,7 @@ define xen::domu (
                 onlyif  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 timeout => 60,
                 notify  => Exec["xen_destroy_${domU_hostname}"],
-                require => Service['xen']
+                require => Service['xen'],
             }
             # Shutdown the VM (more abruptly)
             exec { "xen_destroy_${domU_hostname}":
@@ -346,13 +346,13 @@ define xen::domu (
                 command     => "${xen::params::toolstack} destroy ${domU_hostname}",
                 onlyif      => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 refreshonly => true,
-                require     => Service['xen']
+                require     => Service['xen'],
             }
 
             # remove the symbolic link
             file { "${xen::params::autodir}/${order}-${domU_hostname}":
                 ensure  => 'absent',
-                require => File[$xen::params::autodir]
+                require => File[$xen::params::autodir],
             }
 
         }

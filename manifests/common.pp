@@ -12,26 +12,26 @@
 class xen::common {
 
     # Load the variables used in this module. Check the xen-params.pp file
-    require xen::params
+    require ::xen::params
 
     package { $xen::params::kernel_package:
-        ensure => $xen::ensure
+        ensure => $xen::ensure,
     }
 
     package { 'xen':
         ensure  => $xen::ensure,
         name    => $xen::params::packagename,
-        require => Package[$xen::params::kernel_package]
-    } ->
-    package { $xen::params::utils_packages:
-        ensure  => $xen::ensure ? { 'present' => 'latest', default => 'absent'}
-    } ->
-    file { $xen::params::configdir:
+        require => Package[$xen::params::kernel_package],
+    }
+    -> package { $xen::params::utils_packages:
+        ensure  => $xen::ensure ? { 'present' => 'latest', default => 'absent'},
+    }
+    -> file { $xen::params::configdir:
         ensure  => 'directory',
         owner   => $xen::params::configdir_owner,
         group   => $xen::params::configdir_group,
         mode    => $xen::params::configdir_mode,
-        require => Package['xen']
+        require => Package['xen'],
     }
 
 
@@ -50,7 +50,7 @@ class xen::common {
         user        => 'root',
         logoutput   => true,
         timeout     => 10,
-        refreshonly => true
+        refreshonly => true,
     }
 
     # disable the OS prober, so that you don't get boot entries for each virtual
@@ -59,7 +59,7 @@ class xen::common {
         context => '/files//etc/default/grub',
         changes => "set GRUB_DISABLE_OS_PROBER 'true'",
         onlyif  => "get GRUB_DISABLE_OS_PROBER  != 'true'",
-        notify  => Exec['update-grub']
+        notify  => Exec['update-grub'],
     }
 
     if ($xen::dom0_mem != '') {
@@ -67,7 +67,7 @@ class xen::common {
             context => '/files//etc/default/grub',
             changes => "set GRUB_CMDLINE_XEN '\"dom0_mem=${xen::dom0_mem}M,max:${xen::dom0_mem}M no-bootscrub\"'",
             onlyif  => "get GRUB_CMDLINE_XEN  != '\"dom0_mem=${xen::dom0_mem}M,max:${xen::dom0_mem}M no-bootscrub\"'",
-            notify  => Exec['update-grub']
+            notify  => Exec['update-grub'],
         }
     }
 
@@ -79,13 +79,13 @@ class xen::common {
         context => '/files/etc/default/xendomains',
         changes => "set XENDOMAINS_SAVE '\"\"'",
         onlyif  => "get XENDOMAINS_SAVE != '\"\"'",
-        require => Package['xen']
+        require => Package['xen'],
     }
     augeas { '/etc/default/xendomains/XENDOMAINS_RESTORE':
         context => '/files/etc/default/xendomains',
         changes => "set XENDOMAINS_RESTORE 'false'",
         onlyif  => "get XENDOMAINS_RESTORE != 'false'",
-        require => Package['xen']
+        require => Package['xen'],
     }
 
     file { $xen::params::scriptsdir:
@@ -93,7 +93,7 @@ class xen::common {
         owner   => $xen::params::configdir_owner,
         group   => $xen::params::configdir_group,
         mode    => $xen::params::configdir_mode,
-        require => File[$xen::params::configdir]
+        require => File[$xen::params::configdir],
     }
 
     file { $xen::params::autodir:
@@ -101,13 +101,13 @@ class xen::common {
         owner   => $xen::params::configdir_owner,
         group   => $xen::params::configdir_group,
         mode    => $xen::params::configdir_mode,
-        require => File[$xen::params::configdir]
+        require => File[$xen::params::configdir],
     }
     augeas { '/etc/default/xendomains/XENDOMAINS_AUTO':
         context => '/files/etc/default/xendomains',
         changes => "set XENDOMAINS_AUTO '\"${xen::params::autodir}\"'",
         onlyif  => "get XENDOMAINS_AUTO != '\"${xen::params::autodir}\"'",
-        require => Package['xen']
+        require => Package['xen'],
     }
 
     # TODO: Edit /etc/xen/xend-config.sxp to enable the network bridge.
@@ -122,7 +122,7 @@ class xen::common {
         mode    => $xen::params::configfile_mode,
         content => template('xen/xend-config.sxp.erb'),
         require => File[$xen::params::configdir],
-        notify  => Service['xen']
+        notify  => Service['xen'],
     }
 
 
@@ -140,7 +140,7 @@ class xen::common {
         owner   => $xen::params::configfile_owner,
         group   => $xen::params::configfile_group,
         mode    => $xen::params::configfile_mode,
-        require => File[$xen::params::toolsdir]
+        require => File[$xen::params::toolsdir],
     }
 
     # Prepare the role directory
@@ -149,7 +149,7 @@ class xen::common {
         owner   => $xen::params::configdir_owner,
         group   => $xen::params::configdir_group,
         mode    => $xen::params::configdir_mode,
-        require => File[$xen::params::toolsdir]
+        require => File[$xen::params::toolsdir],
     }
 
     file { "${xen::params::roledir}/motd":
@@ -158,7 +158,7 @@ class xen::common {
         group   => $xen::params::configdir_group,
         mode    => '0755',
         content => template('xen/role.d/motd.erb'),
-        require => File[$xen::params::roledir]
+        require => File[$xen::params::roledir],
     }
 
     # Prepare the skeleton directory
@@ -169,7 +169,7 @@ class xen::common {
         mode    => $xen::params::configdir_mode,
         source  => 'puppet:///modules/xen/xen-tools/skel',
         recurse => true,
-        require => File[$xen::params::toolsdir]
+        require => File[$xen::params::toolsdir],
     }
 
 

@@ -166,21 +166,21 @@ class xen::params {
     $utils_packages = $::lsbdistcodename ? {
         'squeeze' => [
                       'xen-tools',
-                      'xen-utils-4.0'
+                      'xen-utils-4.0',
                       ],
         'wheezy'  => [
                       'xen-tools',
                       'xen-utils-4.1',
-                      'debootstrap'
+                      'debootstrap',
                       ],
         'jessie'  => [
                       'xen-tools',
                       'xen-utils-4.4',
-                      'debootstrap'
+                      'debootstrap',
                       ],
         default   => [
                       'xen-tools',
-                      'xen-utils-4.1'
+                      'xen-utils-4.1',
                       ]
     }
 
