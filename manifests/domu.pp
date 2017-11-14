@@ -223,66 +223,66 @@ define xen::domu (
     # stage one: ensure the domu exists
     if ($ensure in ['present', 'running', 'stopped']) {
 
-       exec { "xen_create_${domu_hostname}":
-           path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-           command => $xen_create_image_cmd,
-           #creates => "/dev/mapper/${xen::domu_lvm}-${domu_hostname}--disk",
-           creates => $domu_configfile,
-           timeout => $timeout,
-           require => [
-                       File[$xen::params::configdir],
-                       File["${xen::params::toolsdir}/xen-tools.conf"]
-                       ],
-       }
-       # this should have created /etc/xen/${domu_hostname}.cfg
-       file { $domu_configfile:
-           ensure  => 'file',
-           owner   => $xen::params::configfile_owner,
-           group   => $xen::params::configfile_group,
-           mode    => '0644',
-           require => [
-                       Package['xen'],
-                       Package[$xen::params::kernel_package],
-                       File[$xen::params::configdir],
-                       Exec["xen_create_${domu_hostname}"]
-                       ],
-       }
+        exec { "xen_create_${domu_hostname}":
+            path    => '/usr/bin:/usr/sbin:/bin:/sbin',
+            command => $xen_create_image_cmd,
+            #creates => "/dev/mapper/${xen::domu_lvm}-${domu_hostname}--disk",
+            creates => $domu_configfile,
+            timeout => $timeout,
+            require => [
+                        File[$xen::params::configdir],
+                        File["${xen::params::toolsdir}/xen-tools.conf"]
+                        ],
+        }
+        # this should have created /etc/xen/${domu_hostname}.cfg
+        file { $domu_configfile:
+            ensure  => 'file',
+            owner   => $xen::params::configfile_owner,
+            group   => $xen::params::configfile_group,
+            mode    => '0644',
+            require => [
+                        Package['xen'],
+                        Package[$xen::params::kernel_package],
+                        File[$xen::params::configdir],
+                        Exec["xen_create_${domu_hostname}"]
+                        ],
+        }
 
-       exec { "Adapting ${domu_snapshot_configfile}":
-           command => "sed 's/${xen::domu_lvm}\\/${domu_hostname}-disk/${xen::domu_lvm}\\/${domu_hostname}-snapshot-disk/' ${domu_configfile} >  ${domu_snapshot_configfile}",
-           path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-           user    => $xen::params::configfile_owner,
-           group   => $xen::params::configfile_group,
-           require => File[$domu_configfile],
-       }
+        exec { "Adapting ${domu_snapshot_configfile}":
+            command => "sed 's/${xen::domu_lvm}\\/${domu_hostname}-disk/${xen::domu_lvm}\\/${domu_hostname}-snapshot-disk/' ${domu_configfile} >  ${domu_snapshot_configfile}",
+            path    => '/usr/bin:/usr/sbin:/bin:/sbin',
+            user    => $xen::params::configfile_owner,
+            group   => $xen::params::configfile_group,
+            require => File[$domu_configfile],
+        }
 
-       file { $domu_infofile:
-           ensure  => 'file',
-           replace => false,
-           content => template('xen/info_domu.txt.erb'),
-           require => Exec["xen_create_${domu_hostname}"],
-       }
+        file { $domu_infofile:
+            ensure  => 'file',
+            replace => false,
+            content => template('xen/info_domu.txt.erb'),
+            require => Exec["xen_create_${domu_hostname}"],
+        }
 
     } elsif ($ensure == 'absent') {
 
-       info("deleting Xen domu ${domu_hostname}")
-       exec { "xen_delete_${domu_hostname}":
-           path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-           command => "xen-delete-image --lvm ${xen::domu_lvm} ${domu_hostname}",
-           onlyif  => "test -e /dev/mapper/${xen::domu_lvm}-${domu_hostname}--disk",
-           unless  => "${xen::params::toolstack} list | grep -e '^${domu_hostname} '",
-           timeout => $timeout,
-           require => [
-                       Package['xen-tools'],
-                       File["${xen::params::toolsdir}/xen-tools.conf"],
-                       Exec["xen_shutdown_${domu_hostname}"]
-                       ],
-       }
+        info("deleting Xen domu ${domu_hostname}")
+        exec { "xen_delete_${domu_hostname}":
+            path    => '/usr/bin:/usr/sbin:/bin:/sbin',
+            command => "xen-delete-image --lvm ${xen::domu_lvm} ${domu_hostname}",
+            onlyif  => "test -e /dev/mapper/${xen::domu_lvm}-${domu_hostname}--disk",
+            unless  => "${xen::params::toolstack} list | grep -e '^${domu_hostname} '",
+            timeout => $timeout,
+            require => [
+                        Package['xen-tools'],
+                        File["${xen::params::toolsdir}/xen-tools.conf"],
+                        Exec["xen_shutdown_${domu_hostname}"]
+                        ],
+        }
 
-       file { [ $domu_configfile, $domu_snapshot_configfile, $domu_infofile ]:
-           ensure  => $ensure,
-           require => Exec["xen_delete_${domu_hostname}"],
-       }
+        file { [ $domu_configfile, $domu_snapshot_configfile, $domu_infofile ]:
+            ensure  => $ensure,
+            require => Exec["xen_delete_${domu_hostname}"],
+        }
 
     }
 
