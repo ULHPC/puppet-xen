@@ -33,8 +33,17 @@
 # [Remember: No empty lines between comments and class definition]
 #
 define xen::network::bridge (
-    $ensure    = $xen::ensure,
-    $comment   = ''
+    $ensure          = $xen::ensure,
+    $comment         = '',
+    $ensure          = $xen::ensure,
+    $comment         = '',
+    $address         = '',
+    $netmask         = '',
+    $network         = '',
+    $broadcast       = '',
+    $gateway         = '',
+    $dns_nameservers = '',
+    $dns_search      = ''
 )
 {
 
@@ -56,10 +65,17 @@ define xen::network::bridge (
     }
 
     network::interface { $bridge_interface:
-        nettype     => 'Bridge',
-        bridge_port => $interface,
-        comment     => $comment,
-        manual      => true,
-        dhcp        => false
+        nettype         => 'Bridge',
+        bridge_port     => $interface,
+        comment         => $comment,
+        manual          => true,
+        dhcp            => false,
+        address         => $address,
+        netmask         => $netmask,
+        network         => $network,
+        broadcast       => $broadcast,
+        gateway         => $gateway,
+        dns_nameservers => $dns_nameservers,
+        dns_search      => $dns_search
     }
 }
