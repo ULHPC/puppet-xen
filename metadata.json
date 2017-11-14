@@ -1,7 +1,7 @@
 {
   "name": "ULHPC/xen",
-  "version": "0.2.9",
-  "author": "S. Varrette, H. Cartiaux, V. Plugaru, S. Diehl aka. UL HPC Management Team",
+  "version": "0.2.10",
+  "author": "UL HPC Team",
   "mail": "hpc-sysadmins@uni.lu",
   "summary": "Configure and manage Xen",
   "description": "Configure and manage Xen",
@@ -54,6 +54,7 @@
     "xen::params"
   ],
   "definitions": [
-    "xen::domu"
+    "xen::domu",
+    "xen::network::bridge"
   ]
 }

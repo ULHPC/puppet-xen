@@ -17,15 +17,15 @@
 #     bridge
 # $dom0_memory:: *Default*: empty. Set the memory (in MB) for the Dom0, and
 #     disable dom0 ballooning
-# $domU_lvm:: *Default*: 'vg_${hostname}_domU'. LVM volume group to use for
-#     hosting domU disk image
-# $domU_size:: *Default*: '10Gb'.
-# $domU_memory:: *Default*: '256Mb'.
-# $domU_swap:: *Default*: '512Mb'
-# $domU_gateway:: *Default*: '10.74.0.1'
-# $domU_netmask:: *Default*: '255.255.0.0'
-# $domU_broadcast:: *Default*: '10.74.255.255'
-# $domU_arch:: *Default*: 'amd64'
+# $domu_lvm:: *Default*: 'vg_${hostname}_domu'. LVM volume group to use for
+#     hosting domu disk image
+# $domu_size:: *Default*: '10Gb'.
+# $domu_memory:: *Default*: '256Mb'.
+# $domu_swap:: *Default*: '512Mb'
+# $domu_gateway:: *Default*: '10.74.0.1'
+# $domu_netmask:: *Default*: '255.255.0.0'
+# $domu_broadcast:: *Default*: '10.74.255.255'
+# $domu_arch:: *Default*: 'amd64'
 #
 # == Requires:
 #
@@ -56,14 +56,14 @@ class xen(
     $bridge_on      = $xen::params::bridge_on,
     $if_shared      = $xen::params::if_shared,
     $dom0_mem       = $xen::params::dom0_mem,
-    $domU_lvm       = $xen::params::domU_lvm,
-    $domU_size      = $xen::params::domU_size,
-    $domU_memory    = $xen::params::domU_memory,
-    $domU_swap      = $xen::params::domU_swap,
-    $domU_gateway   = $xen::params::domU_gateway,
-    $domU_netmask   = $xen::params::domU_netmask,
-    $domU_broadcast = $xen::params::domU_broadcast,
-    $domU_arch      = $xen::params::domU_arch
+    $domu_lvm       = $xen::params::domu_lvm,
+    $domu_size      = $xen::params::domu_size,
+    $domu_memory    = $xen::params::domu_memory,
+    $domu_swap      = $xen::params::domu_swap,
+    $domu_gateway   = $xen::params::domu_gateway,
+    $domu_netmask   = $xen::params::domu_netmask,
+    $domu_broadcast = $xen::params::domu_broadcast,
+    $domu_arch      = $xen::params::domu_arch
 )
 inherits xen::params
 {
@@ -74,7 +74,7 @@ inherits xen::params
     }
 
     case $::operatingsystem {
-        debian, ubuntu:         { include xen::common::debian }
+        'debian', 'ubuntu':         { include ::xen::common::debian }
         default: {
             fail("Module ${module_name} is not supported on ${::operatingsystem}")
         }

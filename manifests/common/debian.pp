@@ -10,9 +10,9 @@
 class xen::common::debian inherits xen::common {
 
     # Bug fix on error: "net.bridge.bridge-nf-call-iptables" is an unknown key
-    include kernel
+    include ::kernel
     kernel::module { 'bridge':
-        ensure => 'present'
+        ensure => 'present',
     }
 
     # Disable bridge filtering
@@ -22,16 +22,16 @@ class xen::common::debian inherits xen::common {
     # net.bridge.bridge-nf-filter-vlan-tagged = 0
 
 
-    include sysctl
+    include ::sysctl
     sysctl::value { [
                     'net.bridge.bridge-nf-call-arptables',
                     'net.bridge.bridge-nf-call-ip6tables',
                     'net.bridge.bridge-nf-call-iptables',
-                    'net.bridge.bridge-nf-filter-vlan-tagged'
+                    'net.bridge.bridge-nf-filter-vlan-tagged',
                     ]:
                         ensure  => $xen::ensure,
                         value   => '0',
-                        require => Kernel::Module['bridge']
+                        require => Kernel::Module['bridge'],
     }
 
     # Debian Squeeze: patch the network script!
@@ -42,7 +42,7 @@ class xen::common::debian inherits xen::common {
             source => 'puppet:///modules/xen/squeeze-network-bridge.patch',
             owner  => 'root',
             group  => 'root',
-            mode   => '0644'
+            mode   => '0644',
         }
 
         exec { 'patch Xen network-brige':
@@ -50,7 +50,7 @@ class xen::common::debian inherits xen::common {
             path    => '/usr/bin:/usr/sbin:/bin',
             user    => 'root',
             onlyif  => "grep '[ -n \"${xen::gateway}\" ] && ip route add default via ${xen::gateway}' ${xen::params::scriptsdir}/network-bridge",
-            require => File[$patchfile]
+            require => File[$patchfile],
         }
     }
 
@@ -62,7 +62,7 @@ class xen::common::debian inherits xen::common {
             source => 'puppet:///modules/xen/wheezy-network-bridge.patch',
             owner  => 'root',
             group  => 'root',
-            mode   => '0644'
+            mode   => '0644',
         }
 
         exec { 'patch Xen network-brige':
@@ -70,7 +70,7 @@ class xen::common::debian inherits xen::common {
             path    => '/usr/bin:/usr/sbin:/bin',
             user    => 'root',
             onlyif  => "grep 'brctl show | wc -l' ${xen::params::scriptsdir}/network-bridge",
-            require => File[$patchfile]
+            require => File[$patchfile],
         }
     }
 
@@ -80,9 +80,9 @@ class xen::common::debian inherits xen::common {
             location => 'http://http.debian.net/debian',
             release  => "${::lsbdistcodename}-backports",
             repos    => 'main contrib non-free',
-            pin      => '200'
-        } ->
-        apt::pin {'wheezy-backports-xentools':
+            pin      => '200',
+        }
+        -> apt::pin {'wheezy-backports-xentools':
           ensure   => present,
           packages => 'debootstrap xen-tools',
           priority => 999,
@@ -100,7 +100,7 @@ class xen::common::debian inherits xen::common {
             group   => $xen::params::configdir_group,
             mode    => '0755',
             content => template('xen/network-bridge.erb'),
-            require => File[$xen::params::scriptsdir]
+            require => File[$xen::params::scriptsdir],
         }
 
         $if_bridge = delete($xen::bridge_on, $xen::if_shared)

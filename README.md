@@ -9,7 +9,7 @@
 
 Configure and manage Xen
 
-      Copyright (c) 2017 S. Varrette, H. Cartiaux, V. Plugaru, S. Diehl aka. UL HPC Management Team <hpc-sysadmins@uni.lu>
+      Copyright (c) 2017 UL HPC Team <hpc-sysadmins@uni.lu>
       
 
 | [Project Page](https://github.com/ULHPC/puppet-xen) | [Sources](https://github.com/ULHPC/puppet-xen) | [Documentation](https://ulhpc-puppet-xen.readthedocs.org/en/latest/) | [Issues](https://github.com/ULHPC/puppet-xen/issues) |
@@ -28,6 +28,7 @@ This module implements the following elements:
 
 * __Puppet definitions__: 
     - `xen::domu` 
+    - `xen::network::bridge` 
 
 All these components are configured through a set of variables you will find in
 [`manifests/params.pp`](manifests/params.pp). 
@@ -77,6 +78,23 @@ Example:
         }
 
 See also [`tests/domu.pp`](tests/domu.pp)
+
+### Definition `xen::network::bridge`
+
+The definition `xen::network::bridge` provides ...
+This definition accepts the following parameters:
+
+* `$ensure`: default to 'present', can be 'absent'
+* `$content`: specify the contents of the directive as a string
+* `$source`: copy a file as the content of the directive.
+
+Example:
+
+        xen::network::bridge { 'toto':
+		      ensure => 'present',
+        }
+
+See also [`tests/network/bridge.pp`](tests/network/bridge.pp)
 
 
 ## Librarian-Puppet / R10K Setup
