@@ -306,6 +306,7 @@ define xen::domu (
             exec { "xen_run_${domU_hostname}":
                 path    => '/usr/bin:/usr/sbin:/bin:/sbin',
                 command => "${xen::params::toolstack} create ${domU_hostname}.cfg",
+                cwd     => "${xen::params::configdir}",
                 unless  => "${xen::params::toolstack} list | grep -e '^${domU_hostname} '",
                 require => [
                             Exec["xen_create_${domU_hostname}"],
