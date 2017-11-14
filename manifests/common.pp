@@ -18,13 +18,15 @@ class xen::common {
         ensure => $xen::ensure,
     }
 
+    $xen_ensure = $xen::ensure ? { 'present' => 'latest', default => 'absent'}
+
     package { 'xen':
         ensure  => $xen::ensure,
         name    => $xen::params::packagename,
         require => Package[$xen::params::kernel_package],
     }
     -> package { $xen::params::utils_packages:
-        ensure  => $xen::ensure ? { 'present' => 'latest', default => 'absent'},
+        ensure  => $xen_ensure,
     }
     -> file { $xen::params::configdir:
         ensure  => 'directory',

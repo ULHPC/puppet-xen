@@ -27,7 +27,7 @@ node default {
         domU_arch      => 'amd64'
     }
 
-#    xen::domU { 'test-vm':
+#    xen::domu { 'test-vm':
 #        ensure  => 'running',
 #        order   => 25,
 #        desc    => 'Test VM',
