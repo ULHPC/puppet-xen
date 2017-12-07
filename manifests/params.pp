@@ -154,13 +154,15 @@ class xen::params {
     $packagename = $::lsbdistcodename ? {
         'squeeze' => 'xen-hypervisor-4.0-amd64',
         'wheezy'  => 'xen-hypervisor-4.1-amd64',
-        default   => 'xen-hypervisor-4.1-amd64'
+        'jessie'  => 'xen-hypervisor-4.4-amd64',
+        default   => 'xen-hypervisor-4.4-amd64'
     }
 
     $kernel_package = $::lsbdistcodename ? {
         'squeeze' => 'linux-image-2.6-xen-amd64',
         'wheezy'  => 'linux-image-3.2.0-4-amd64',
-        default   => 'linux-image-3.2.0-4-amd64'
+        'jessie'  => 'linux-image-3.16.0-4-amd64',
+        default   => 'linux-image-3.16.0-4-amd64'
     }
 
     $utils_packages = $::lsbdistcodename ? {
