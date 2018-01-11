@@ -89,7 +89,11 @@ class xen::common::debian inherits xen::common {
           release  => 'wheezy-backports',
         } -> Package['xen']
     }
-
+    file { "${xen::params::tools_bootstrapdir}/stretch.d":
+        ensure => 'link',
+        target => "${xen::params::tools_bootstrapdir}/debian.d",
+        before => Package[$xen::params::utils_packages],
+    }
 
     if $::lsbdistcodename in ['squeeze', 'wheezy']
     {
