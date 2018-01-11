@@ -264,6 +264,9 @@ class xen::params {
     $toolsdir = $::operatingsystem ? {
         default => '/etc/xen-tools',
     }
+    $tools_bootstrapdir = $::operatingsystem ? {
+        default => '/usr/share/xen-tools',
+    }
     $tools_logdir  = $::operatingsystem ? {
         default => '/var/log/xen-tools',
     }
