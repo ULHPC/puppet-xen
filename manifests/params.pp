@@ -161,8 +161,8 @@ class xen::params {
     $kernel_package = $::lsbdistcodename ? {
         'squeeze' => 'linux-image-2.6-xen-amd64',
         'wheezy'  => 'linux-image-3.2.0-4-amd64',
-        'jessie'  => 'linux-image-3.16.0-4-amd64',
-        default   => 'linux-image-3.16.0-4-amd64'
+        'jessie'  => 'linux-image-3.16.0-6-amd64',
+        default   => 'linux-image-3.16.0-6-amd64'
     }
 
     $utils_packages = $::lsbdistcodename ? {
